@@ -254,25 +254,6 @@ func (s *Server) handleReplay(w http.ResponseWriter, r *http.Request, u *store.U
 	writeJSON(w, status, d)
 }
 
-func (s *Server) handleStats(w http.ResponseWriter, r *http.Request, u *store.User) {
-	st, err := s.store.Stats(r.Context(), u.ID)
-	if err != nil {
-		writeErr(w, 500, "could not load stats")
-		return
-	}
-	writeJSON(w, 200, map[string]any{"stats": st, "active_tunnels": len(s.hub.ListForUser(u.ID))})
-}
-
 func (s *Server) handleTunnels(w http.ResponseWriter, r *http.Request, u *store.User) {
 	writeJSON(w, 200, s.hub.ListForUser(u.ID))
-}
-
-func (s *Server) handleActivity(w http.ResponseWriter, r *http.Request, u *store.User) {
-	pts, err := s.store.Activity(r.Context(), u.ID)
-	if err != nil {
-		s.log.Error("activity", "err", err)
-		writeErr(w, 500, "could not load activity")
-		return
-	}
-	writeJSON(w, 200, pts)
 }

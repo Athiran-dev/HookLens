@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/hooklens/hooklens/internal/proto"
@@ -39,6 +40,7 @@ type Tunnel struct {
 	closed     chan struct{}
 	closeOnce  sync.Once
 	maxPending int
+	kicked     atomic.Bool
 
 	mu      sync.Mutex
 	pending map[string]*pendingDelivery
@@ -126,6 +128,14 @@ func (t *Tunnel) Close() {
 	})
 }
 
+// Kick closes the tunnel on the user's request (dashboard Disconnect); the CLI is told not to reconnect.
+func (t *Tunnel) Kick() {
+	t.kicked.Store(true)
+	t.Close()
+}
+
+func (t *Tunnel) Kicked() bool { return t.kicked.Load() }
+
 func (t *Tunnel) PendingCount() int {
 	t.mu.Lock()
 	defer t.mu.Unlock()
@@ -180,6 +190,7 @@ func (h *Hub) CountForUser(userID string) int {
 }
 
 type Info struct {
+	Target      string    `json:"target"`
 	TunnelID    string    `json:"tunnel_id"`
 	EndpointID  string    `json:"endpoint_id"`
 	ConnectedAt time.Time `json:"connected_at"`
@@ -192,7 +203,7 @@ func (h *Hub) ListForUser(userID string) []Info {
 	out := []Info{}
 	for _, t := range h.tunnels {
 		if t.UserID == userID {
-			out = append(out, Info{t.ID, t.EndpointID, t.ConnectedAt, t.PendingCount()})
+			out = append(out, Info{Target: t.Target, TunnelID: t.ID, EndpointID: t.EndpointID, ConnectedAt: t.ConnectedAt, Pending: t.PendingCount()})
 		}
 	}
 	return out

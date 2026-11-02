@@ -1,141 +1,120 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Shell, { useMeContext } from "@/components/Shell";
-import { Button, Card, CopyButton, ErrorNote, Input, PageTitle } from "@/components/ui";
-import { api, formatBytes, timeAgo } from "@/lib/api";
+import { useState } from "react";
+import Shell, { useApp } from "@/components/Shell";
+import { Button, ErrorNote, Input } from "@/components/ui";
+import { Field, Modal, PageHeader, Panel, Select } from "@/components/app";
+import { useToast } from "@/components/toast";
+import { api, formatBytes } from "@/lib/api";
 
-type Token = { id: string; kind: "cli" | "api"; name: string; created_at: string; last_used_at: string | null };
-
-function Section({ title, children, desc }: { title: string; desc?: string; children: React.ReactNode }) {
+/** One settings section: title and help on the left, controls on the right. */
+function Section({ title, desc, children, danger = false }: { title: string; desc: string; children: React.ReactNode; danger?: boolean }) {
   return (
-    <Card className="mb-5 p-5">
-      <h2 className="text-base font-semibold text-white">{title}</h2>
-      {desc && <p className="mb-4 mt-1 text-sm text-slate-400">{desc}</p>}
-      {!desc && <div className="mb-3" />}
-      {children}
-    </Card>
+    <div className={`grid gap-4 border-b border-white/[0.06] px-6 py-7 last:border-0 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10 ${danger ? "bg-red-500/[0.02]" : ""}`}>
+      <div>
+        <h2 className={`text-[15px] font-semibold ${danger ? "text-red-300" : "text-zinc-100"}`}>{title}</h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">{desc}</p>
+      </div>
+      <div className="min-w-0">{children}</div>
+    </div>
   );
 }
 
 function Settings() {
-  const { me, refresh } = useMeContext();
-  const [tokens, setTokens] = useState<Token[]>([]);
-  const [keyName, setKeyName] = useState("");
-  const [newKey, setNewKey] = useState("");
+  const { me, refresh } = useApp();
+  const toast = useToast();
+  const [retention, setRetention] = useState(String(me.user.retention_days));
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [retention, setRetention] = useState(me.user.retention_days);
-  const [saved, setSaved] = useState(false);
-  const [delPw, setDelPw] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [pw, setPw] = useState("");
 
-  const loadTokens = useCallback(async () => setTokens(await api<Token[]>("GET", "/api/v1/tokens")), []);
-  useEffect(() => {
-    loadTokens().catch(() => {});
-  }, [loadTokens]);
-
-  async function guard(fn: () => Promise<void>) {
+  async function saveRetention() {
+    setSaving(true);
     setError("");
     try {
-      await fn();
+      await api("PATCH", "/api/v1/me", { retention_days: Number(retention) });
+      toast("Retention updated");
+      refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+      setError(e instanceof Error ? e.message : "Could not save");
+    } finally {
+      setSaving(false);
     }
   }
 
   return (
     <>
-      <PageTitle title="Settings" />
+      <PageHeader crumbs={["Dashboard", "Settings"]} title="Settings" subtitle="Your account, data retention and limits." />
       {error && <div className="mb-4"><ErrorNote>{error}</ErrorNote></div>}
 
-      <Section title="Profile">
-        <dl className="grid grid-cols-[9rem_1fr] gap-y-2 text-sm">
-          <dt className="text-slate-500">Email</dt><dd>{me.user.email}</dd>
-          <dt className="text-slate-500">Member since</dt><dd>{new Date(me.user.created_at).toLocaleDateString()}</dd>
-          <dt className="text-slate-500">Active sessions</dt>
-          <dd className="flex items-center gap-3">
-            {me.active_sessions}
-            <Button variant="outline" className="!px-2.5 !py-1 text-xs" onClick={() => guard(async () => { await api("POST", "/api/v1/auth/logout-all", {}); window.location.href = "/login/"; })}>
-              Log out of all sessions
-            </Button>
-          </dd>
-        </dl>
-      </Section>
+      <Panel flush>
+        <Section title="Account" desc="The email you sign in with.">
+          <dl className="grid max-w-md grid-cols-[8rem_1fr] gap-y-3 text-sm">
+            <dt className="text-zinc-500">Email</dt><dd className="text-zinc-100">{me.user.email}</dd>
+            <dt className="text-zinc-500">Member since</dt><dd className="text-zinc-300">{new Date(me.user.created_at).toLocaleDateString(undefined, { dateStyle: "long" })}</dd>
+            <dt className="text-zinc-500">Plan</dt><dd className="text-zinc-300">Free (beta)</dd>
+          </dl>
+        </Section>
 
-      <Section title="Usage limits" desc="Beta limits that keep the service fast for everyone.">
-        <ul className="space-y-1 text-sm text-slate-300">
-          <li>Up to {me.limits.max_endpoints} endpoints</li>
-          <li>Up to {me.limits.max_tunnels} simultaneous CLI tunnels</li>
-          <li>Payloads up to {formatBytes(me.limits.max_body_bytes)}</li>
-        </ul>
-      </Section>
-
-      <Section title="Data retention" desc="Captured requests are deleted automatically after this many days.">
-        <div className="flex items-center gap-3">
-          <select value={retention} onChange={(e) => { setRetention(Number(e.target.value)); setSaved(false); }} className="rounded-md border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-slate-200">
-            {[1, 3, 7, 14, 30].map((d) => <option key={d} value={d}>{d} day{d > 1 ? "s" : ""}</option>)}
-          </select>
-          <Button variant="outline" onClick={() => guard(async () => { await api("PATCH", "/api/v1/me", { retention_days: retention }); setSaved(true); refresh(); })}>Save</Button>
-          {saved && <span className="text-sm text-brand">Saved</span>}
-        </div>
-      </Section>
-
-      <Section title="API keys & CLI logins" desc="Use an API key with `hooklens login --token` or the HOOKLENS_TOKEN variable (for CI or servers). Tokens are shown once.">
-        <form
-          className="mb-4 flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            guard(async () => {
-              const r = await api<{ token: string }>("POST", "/api/v1/tokens", { name: keyName });
-              setNewKey(r.token);
-              setKeyName("");
-              await loadTokens();
-            });
-          }}
-        >
-          <Input required maxLength={60} placeholder="Key name, e.g. laptop" value={keyName} onChange={(e) => setKeyName(e.target.value)} />
-          <Button type="submit" className="whitespace-nowrap">Create key</Button>
-        </form>
-        {newKey && (
-          <div className="mb-4 rounded-md border border-brand/40 bg-brand/5 p-3">
-            <p className="mb-2 text-xs text-slate-300">Copy this key now. You won&apos;t see it again.</p>
-            <div className="flex items-center gap-2">
-              <code className="min-w-0 flex-1 truncate text-xs text-white">{newKey}</code>
-              <CopyButton text={newKey} />
-            </div>
+        <Section title="Sessions" desc="Browsers currently signed in to your account.">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="text-sm text-zinc-300"><b className="tabular-nums text-white">{me.active_sessions}</b> active session{me.active_sessions === 1 ? "" : "s"}</span>
+            <Button variant="outline" onClick={async () => { await api("POST", "/api/v1/auth/logout-all", {}); window.location.href = "/login/"; }}>Log out of all sessions</Button>
           </div>
-        )}
-        {tokens.length === 0 ? (
-          <p className="text-sm text-slate-500">No keys or CLI logins yet.</p>
-        ) : (
-          <ul className="divide-y divide-ink-700">
-            {tokens.map((t) => (
-              <li key={t.id} className="flex items-center gap-3 py-2 text-sm">
-                <span className="rounded bg-ink-700 px-1.5 py-0.5 text-[11px] uppercase text-slate-300">{t.kind}</span>
-                <span className="flex-1">{t.name}</span>
-                <span className="text-xs text-slate-500">last used {timeAgo(t.last_used_at)}</span>
-                <Button variant="danger" className="!px-2.5 !py-1 text-xs" onClick={() => guard(async () => { await api("DELETE", `/api/v1/tokens/${t.id}`); await loadTokens(); })}>Revoke</Button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
+        </Section>
 
-      <Section title="Delete account" desc="Permanently deletes your account, endpoints and every captured request. This cannot be undone.">
-        <form
-          className="flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!window.confirm("Delete your account and all data permanently?")) return;
-            guard(async () => {
-              await api("DELETE", "/api/v1/me", { password: delPw });
-              window.location.href = "/";
-            });
-          }}
-        >
-          <Input type="password" required placeholder="Confirm with your password" value={delPw} onChange={(e) => setDelPw(e.target.value)} />
-          <Button variant="danger" type="submit" className="whitespace-nowrap">Delete account</Button>
-        </form>
-      </Section>
+        <Section title="Data retention" desc="Captured requests are deleted automatically after this period. Shorter is safer for sensitive payloads.">
+          <div className="flex flex-wrap items-end gap-3">
+            <Field label="Keep requests for">
+              <Select value={retention} onChange={setRetention} className="w-44">
+                {[1, 3, 7, 14, 30].map((d) => <option key={d} value={d}>{d} day{d > 1 ? "s" : ""}</option>)}
+              </Select>
+            </Field>
+            <Button variant="outline" onClick={saveRetention} disabled={saving || retention === String(me.user.retention_days)}>{saving ? "Saving…" : "Save"}</Button>
+          </div>
+        </Section>
+
+        <Section title="Plan limits" desc="Beta limits that keep the service fast for everyone.">
+          <table className="w-full max-w-md text-sm">
+            <tbody className="divide-y divide-white/[0.06]">
+              <tr><td className="py-2.5 text-zinc-500">Endpoints</td><td className="py-2.5 text-right text-zinc-200">{me.limits.max_endpoints}</td></tr>
+              <tr><td className="py-2.5 text-zinc-500">Simultaneous tunnels</td><td className="py-2.5 text-right text-zinc-200">{me.limits.max_tunnels}</td></tr>
+              <tr><td className="py-2.5 text-zinc-500">Payload size</td><td className="py-2.5 text-right text-zinc-200">{formatBytes(me.limits.max_body_bytes)}</td></tr>
+            </tbody>
+          </table>
+        </Section>
+
+        <Section danger title="Delete account" desc="Permanently deletes your account, endpoints and every captured request. This cannot be undone.">
+          <Button variant="danger" onClick={() => setDeleting(true)}>Delete account…</Button>
+        </Section>
+      </Panel>
+
+      {deleting && (
+        <Modal title="Delete your account?" onClose={() => setDeleting(false)}>
+          <form
+            className="space-y-4"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setError("");
+              try {
+                await api("DELETE", "/api/v1/me", { password: pw });
+                window.location.href = "/";
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Could not delete account");
+                setDeleting(false);
+              }
+            }}
+          >
+            <p className="text-sm leading-relaxed text-zinc-400">Everything will be erased immediately. Enter your password to confirm.</p>
+            <Field label="Password"><Input type="password" required autoFocus value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
+            <div className="flex justify-end gap-2.5 pt-1">
+              <Button type="button" variant="ghost" onClick={() => setDeleting(false)}>Cancel</Button>
+              <Button type="submit" variant="danger">Delete everything</Button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </>
   );
 }

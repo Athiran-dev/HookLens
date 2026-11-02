@@ -184,3 +184,47 @@ export function formatBytes(n: number): string {
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
   return `${(n / 1024 / 1024).toFixed(1)} MB`;
 }
+
+// ---------- dashboard data ----------
+
+export type WindowStats = { requests: number; prev_requests: number; delivered: number; prev_delivered: number; failed: number; prev_failed: number };
+export type StatsResponse = { stats: Stats; window: WindowStats; active_tunnels: number };
+export type ActivityPoint = { bucket: string; requests: number; delivered: number; failed: number };
+export type ActivityRange = "1h" | "24h" | "7d" | "30d";
+
+export type DeliveryRow = {
+  id: string;
+  kind: "forward" | "replay";
+  status: DeliveryStatus;
+  destination: string;
+  response_code: number | null;
+  duration_ms: number | null;
+  error: string;
+  created_at: string;
+  request_id: string;
+  endpoint_id: string;
+  endpoint_name: string;
+  method: string;
+  path: string;
+};
+
+export type TunnelInfo = { tunnel_id: string; endpoint_id: string; connected_at: string; pending: number; target: string };
+
+/** "+12%" style trend, or null when there is no previous period to compare with. */
+export function trend(cur: number, prev: number): { pct: number; up: boolean } | null {
+  if (prev <= 0) return null;
+  const pct = Math.round(((cur - prev) / prev) * 100);
+  return { pct: Math.abs(pct), up: pct >= 0 };
+}
+
+export function compact(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 10_000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  return n.toLocaleString();
+}
+
+export function duration(fromIso: string): string {
+  const s = Math.max(0, Math.floor((Date.now() - new Date(fromIso).getTime()) / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  return h > 0 ? `${h}h ${m}m` : m > 0 ? `${m}m ${s % 60}s` : `${s}s`;
+}

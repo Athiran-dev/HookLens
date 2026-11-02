@@ -21,7 +21,10 @@ import (
 	"github.com/hooklens/hooklens/internal/proto"
 )
 
-const closeReplaced websocket.StatusCode = 4001
+const (
+	closeReplaced websocket.StatusCode = 4001
+	closeKicked   websocket.StatusCode = 4002
+)
 
 func parseTarget(arg string) (*url.URL, error) {
 	if _, err := strconv.Atoi(arg); err == nil {
@@ -210,6 +213,9 @@ func (t *tunnelRunner) session(ctx context.Context, first bool) error {
 	for {
 		var m proto.Message
 		if err := wsjson.Read(ctx, conn, &m); err != nil {
+			if websocket.CloseStatus(err) == closeKicked {
+				return &fatalError{"this tunnel was disconnected from the HookLens dashboard"}
+			}
 			if websocket.CloseStatus(err) == closeReplaced {
 				return &fatalError{"another `hooklens listen` took over this endpoint; this one has stopped"}
 			}

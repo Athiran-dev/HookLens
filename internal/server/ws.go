@@ -15,7 +15,10 @@ import (
 )
 
 // Close code sent to a CLI whose tunnel was taken over by a newer connection to the same endpoint.
-const closeReplaced websocket.StatusCode = 4001
+const (
+	closeReplaced websocket.StatusCode = 4001
+	closeKicked   websocket.StatusCode = 4002
+)
 
 func (s *Server) wsOrigins() []string {
 	if s.cfg.WebOrigin == "" {
@@ -113,13 +116,10 @@ func (s *Server) handleTunnelWS(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		cancel()
 		t.Close()
-		replaced := !s.hub.Unregister(t)
-		if replaced {
-			_ = c.Close(closeReplaced, "replaced by a newer connection")
-		} else {
+		if s.hub.Unregister(t) { // false when a newer connection already replaced this one
 			s.bus.Publish(u.ID, map[string]any{"type": "tunnel", "endpoint_id": ep.ID, "connected": false})
-			_ = c.Close(websocket.StatusNormalClosure, "bye")
 		}
+		_ = c.Close(websocket.StatusNormalClosure, "bye")
 		s.log.Info("event", "name", "tunnel_disconnected", "user", u.ID, "endpoint", ep.ID)
 	}()
 
@@ -138,6 +138,14 @@ func (s *Server) handleTunnelWS(w http.ResponseWriter, r *http.Request) {
 			case <-ctx.Done():
 				return
 			case <-t.Closed():
+				// Tell the CLI why before the reader context is cancelled: cancelling a pending read
+				// drops the connection without a close frame, and the CLI would just reconnect.
+				switch cur := s.hub.Get(ep.ID); {
+				case t.Kicked():
+					_ = c.Close(closeKicked, "disconnected from the dashboard")
+				case cur != nil && cur != t:
+					_ = c.Close(closeReplaced, "replaced by a newer connection")
+				}
 				return
 			case m := <-t.Outbound():
 				wctx, wcancel := context.WithTimeout(ctx, 10*time.Second)

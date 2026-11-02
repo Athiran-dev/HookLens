@@ -359,3 +359,89 @@ func mustURL(s string) *url.URL {
 	}
 	return u
 }
+
+// dialTunnel opens a raw tunnel connection and consumes the ready message.
+func (u *user) dialTunnel(endpointID string) *websocket.Conn {
+	ctx := context.Background()
+	wsURL := "ws" + strings.TrimPrefix(u.e.ts.URL, "http") + "/api/v1/ws/tunnel?endpoint_id=" + endpointID + "&target=http://localhost:1"
+	conn, _, err := websocket.Dial(ctx, wsURL, &websocket.DialOptions{HTTPHeader: http.Header{"Authorization": {"Bearer " + u.apiKey}}})
+	if err != nil {
+		u.e.t.Fatal(err)
+	}
+	var ready proto.Message
+	if err := wsjson.Read(ctx, conn, &ready); err != nil || ready.Type != proto.TypeReady {
+		u.e.t.Fatalf("no ready: %v", err)
+	}
+	return conn
+}
+
+func closeCodeOf(t *testing.T, conn *websocket.Conn) websocket.StatusCode {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	var m proto.Message
+	err := wsjson.Read(ctx, conn, &m)
+	if err == nil {
+		t.Fatal("expected the connection to close")
+	}
+	return websocket.CloseStatus(err)
+}
+
+// The CLI must be told *why* it was disconnected so it stops instead of reconnecting in a loop.
+func TestTunnelCloseReasons(t *testing.T) {
+	e := newEnv(t)
+	u := e.signup()
+	epID, _ := u.createEndpoint("reasons")
+
+	// disconnect from the dashboard -> 4002
+	c1 := u.dialTunnel(epID)
+	if code, _ := u.call("DELETE", "/api/v1/tunnels/"+epID, nil); code != 200 {
+		t.Fatalf("disconnect: %d", code)
+	}
+	if got := closeCodeOf(t, c1); got != 4002 {
+		t.Fatalf("dashboard disconnect: want close code 4002, got %d", got)
+	}
+	if code, _ := u.call("DELETE", "/api/v1/tunnels/"+epID, nil); code != 404 {
+		t.Fatalf("disconnect with no tunnel: want 404, got %d", code)
+	}
+
+	// a newer connection replaces the older one -> 4001 for the old one
+	c2 := u.dialTunnel(epID)
+	c3 := u.dialTunnel(epID)
+	if got := closeCodeOf(t, c2); got != 4001 {
+		t.Fatalf("replaced tunnel: want close code 4001, got %d", got)
+	}
+	c3.CloseNow()
+
+	// another user cannot disconnect it
+	bob := e.signup()
+	if code, _ := bob.call("DELETE", "/api/v1/tunnels/"+epID, nil); code != 404 {
+		t.Fatalf("cross-user disconnect: want 404, got %d", code)
+	}
+}
+
+// New analytics endpoints return well-formed, zero-filled data for a fresh account.
+func TestAnalyticsEndpoints(t *testing.T) {
+	e := newEnv(t)
+	u := e.signup()
+	for rng, n := range map[string]int{"1h": 12, "24h": 24, "7d": 28, "30d": 30} {
+		req, _ := http.NewRequest("GET", e.ts.URL+"/api/v1/stats/activity?range="+rng, nil)
+		req.Header.Set("Authorization", "Bearer "+u.apiKey)
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var pts []map[string]any
+		_ = json.NewDecoder(resp.Body).Decode(&pts)
+		resp.Body.Close()
+		if resp.StatusCode != 200 || len(pts) != n {
+			t.Fatalf("range %s: status %d, %d buckets (want %d)", rng, resp.StatusCode, len(pts), n)
+		}
+	}
+	if code, body := u.call("GET", "/api/v1/stats", nil); code != 200 || body["window"] == nil {
+		t.Fatalf("stats: %d %v", code, body)
+	}
+	if code, _ := u.call("GET", "/api/v1/deliveries?kind=bogus", nil); code != 400 {
+		t.Fatalf("bad kind: want 400, got %d", code)
+	}
+}
