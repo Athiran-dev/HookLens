@@ -1,0 +1,70 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { api, useMe, type MeResponse } from "@/lib/api";
+import { Logo, Spinner } from "@/components/ui";
+import { createContext, useContext } from "react";
+
+const MeContext = createContext<{ me: MeResponse; refresh: () => void } | null>(null);
+export const useMeContext = () => {
+  const v = useContext(MeContext);
+  if (!v) throw new Error("useMeContext outside Shell");
+  return v;
+};
+
+const nav = [
+  { href: "/dashboard/", label: "Overview" },
+  { href: "/endpoints/", label: "Endpoints" },
+  { href: "/settings/", label: "Settings" },
+  { href: "/docs/", label: "Docs" },
+];
+
+/** Authenticated page frame: top nav + session guard. */
+export default function Shell({ children }: { children: React.ReactNode }) {
+  const { me, refresh } = useMe();
+  const path = usePathname();
+
+  if (!me) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  return (
+    <MeContext.Provider value={{ me, refresh }}>
+      <header className="sticky top-0 z-20 border-b border-ink-700 bg-ink-950/90 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
+          <Link href="/dashboard/">
+            <Logo />
+          </Link>
+          <nav className="flex gap-1 text-sm">
+            {nav.map((n) => {
+              const active = path.startsWith(n.href.replace(/\/$/, "")) || (n.href === "/endpoints/" && path.startsWith("/endpoint"));
+              return (
+                <Link key={n.href} href={n.href} className={`rounded-md px-3 py-1.5 ${active ? "bg-ink-700 text-white" : "text-slate-400 hover:text-white"}`}>
+                  {n.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="ml-auto flex items-center gap-3 text-sm text-slate-400">
+            <span className="hidden sm:inline">{me.user.email}</span>
+            <button
+              className="rounded-md border border-ink-600 px-2.5 py-1 text-slate-300 hover:bg-ink-700"
+              onClick={async () => {
+                await api("POST", "/api/v1/auth/logout", {}).catch(() => {});
+                window.location.href = "/login/";
+              }}
+            >
+              Log out
+            </button>
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+    </MeContext.Provider>
+  );
+}

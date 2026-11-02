@@ -1,0 +1,23 @@
+# Self-contained stack: `docker compose up --build` then open http://localhost:8080
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hooklens
+      POSTGRES_PASSWORD: hooklens
+      POSTGRES_DB: hooklens
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hooklens"]
+      interval: 3s
+      retries: 20
+  app:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgres://hooklens:hooklens@db:5432/hooklens?sslmode=disable
+      PUBLIC_URL: http://localhost:8080
+    ports: ["8080:8080"]
+volumes:
+  pgdata:

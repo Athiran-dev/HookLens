@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body { background: #08090c; color: #d7dbe3; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+::selection { background: #34d39933; }
+pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+* { scrollbar-width: thin; scrollbar-color: #252a35 transparent; }

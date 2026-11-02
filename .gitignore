@@ -1,0 +1,7 @@
+.env
+/bin/
+/dist/
+web/node_modules/
+web/.next/
+web/out/
+*.exe
