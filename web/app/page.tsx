@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui";
 import { Reveal } from "@/components/fx";
+import { IconServer, IconTerminal } from "@/components/icons";
 import { Eyebrow, MiniHistory, MiniInspector, MiniTerminal, ProductShot } from "@/components/landing";
 
 const wrap = "mx-auto w-full max-w-[1320px] px-5 sm:px-8 lg:px-10";
 
 const flow = [
-  { title: "External Service", sub: "Stripe, Razorpay, GitHub…", icon: "↗" },
-  { title: "HookLens", sub: "stores · acknowledges · forwards", icon: "◆", hot: true },
-  { title: "Local Development Server", sub: "localhost:3000", icon: "▸" },
+  { title: "External Service", sub: "Stripe, Razorpay, GitHub…", icon: <IconServer className="h-7 w-7" /> },
+  { title: "HookLens", sub: "stores · acknowledges · forwards", icon: <img src="/mark-white.png" alt="" className="h-7 w-auto" />, hot: true },
+  { title: "Local Development Server", sub: "localhost:3000", icon: <IconTerminal className="h-7 w-7" /> },
 ];
 
 const steps = [
@@ -35,6 +36,28 @@ function Card({ label, title, text, children }: { label: string; title: React.Re
 export default function Landing() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+        <div className="grid-bg absolute inset-0" />
+        <div className="grid-hero absolute inset-x-0 top-0 h-[54rem]" />
+        <svg className="absolute right-0 top-0 h-[44rem] w-[72rem] max-w-full" viewBox="0 0 1150 700" fill="none" preserveAspectRatio="xMaxYMin slice">
+          <defs>
+            <linearGradient id="streakA" x1="1150" y1="0" x2="420" y2="700" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stopColor="#ef6a2b" stopOpacity="0.55" />
+              <stop offset="0.6" stopColor="#ef6a2b" stopOpacity="0.12" />
+              <stop offset="1" stopColor="#ef6a2b" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="streakB" x1="1150" y1="120" x2="640" y2="700" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stopColor="#ffb27a" stopOpacity="0.35" />
+              <stop offset="1" stopColor="#ef6a2b" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d="M1150 0 L420 700" stroke="url(#streakA)" strokeWidth="1.2" />
+          <path d="M1150 90 L560 700" stroke="url(#streakB)" strokeWidth="1" />
+          <path d="M1150 230 L760 700" stroke="url(#streakA)" strokeWidth="1" opacity="0.7" />
+          <path d="M980 0 L260 700" stroke="url(#streakB)" strokeWidth="0.8" opacity="0.6" />
+        </svg>
+        <div className="absolute -right-24 top-24 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(closest-side,rgba(239,106,43,0.13),transparent)]" />
+      </div>
       <div className={`${wrap} pt-4`}>
         <header className="flex h-14 items-center justify-between rounded-2xl border border-white/10 bg-[#101012]/80 px-5 backdrop-blur">
           <Logo height={26} />
@@ -92,7 +115,7 @@ export default function Landing() {
             {flow.flatMap((f, i) => {
               const box = (
                 <div key={f.title} className={`flex items-center justify-center gap-3 rounded-xl border px-5 py-5 ${f.hot ? "border-brand/70 bg-brand/[0.04]" : "border-white/10 bg-[#121214]"}`}>
-                  <span className={`text-2xl ${f.hot ? "text-brand" : "text-zinc-500"}`}>{f.icon}</span>
+                  <span className={`flex shrink-0 items-center ${f.hot ? "text-brand" : "text-zinc-400"}`}>{f.icon}</span>
                   <div className="text-left">
                     <div className="text-sm font-semibold text-zinc-100">{f.title}</div>
                     <div className="text-xs text-zinc-500">{f.sub}</div>

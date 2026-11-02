@@ -78,17 +78,7 @@ export function Segmented<T extends string>({ value, onChange, options }: { valu
   );
 }
 
-export function Select({ value, onChange, children, className = "" }: { value: string; onChange: (v: string) => void; children: React.ReactNode; className?: string }) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`h-9 rounded-lg border border-white/10 bg-black/30 px-3 text-sm text-zinc-200 transition hover:border-white/20 focus:border-brand/60 focus:outline-none ${className}`}
-    >
-      {children}
-    </select>
-  );
-}
+export { Select } from "@/components/select";
 
 export function EmptyState({ title, text, children }: { title: string; text: string; children?: React.ReactNode }) {
   return (

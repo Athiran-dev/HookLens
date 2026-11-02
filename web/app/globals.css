@@ -11,7 +11,7 @@
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-html { background: #0a0a0b; scroll-behavior: smooth; }
+html { scroll-behavior: smooth; }
 body {
   color: #d4d4d8;
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
@@ -30,13 +30,23 @@ pre, code, .font-mono { font-family: var(--font-mono), ui-monospace, SFMono-Regu
   border: 1px solid #26262a;
 }
 .text-gradient { color: #ef6a2b; }
+/* Whole-page faint grid: a plain background, no mask, so it is cheap to paint at any page height. */
 .grid-bg {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%);
+    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+}
+/* Brighter grid behind the hero only (small area, so the fade mask stays cheap). */
+.grid-hero {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+  mask-image: linear-gradient(to bottom, #000 0, #000 45%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 45%, transparent 100%);
 }
 
 /* scroll reveal: transform/opacity only */

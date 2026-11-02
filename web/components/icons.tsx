@@ -21,3 +21,4 @@ export const IconCheck = ({ className }: P) => (<svg {...base} className={classN
 export const IconTerminal = ({ className }: P) => (<svg {...base} className={className}><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M7 9l3 3-3 3M13 15h4" /></svg>);
 export const IconArrowUp = ({ className }: P) => (<svg {...base} width={12} height={12} className={className}><path d="M12 19V5M6 11l6-6 6 6" /></svg>);
 export const IconArrowDown = ({ className }: P) => (<svg {...base} width={12} height={12} className={className}><path d="M12 5v14M6 13l6 6 6-6" /></svg>);
+export const IconServer = ({ className }: P) => (<svg {...base} className={className}><rect x="3" y="4" width="18" height="7" rx="2" /><rect x="3" y="13" width="18" height="7" rx="2" /><path d="M7 7.5h.01M7 16.5h.01" /></svg>);
