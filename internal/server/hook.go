@@ -65,18 +65,11 @@ func (s *Server) handleHook(w http.ResponseWriter, r *http.Request) {
 		SourceIP:    s.clientIP(r),
 		Size:        len(body),
 	}
-	if err := s.store.InsertRequest(ctx, req); err != nil {
+	if err := s.ingest(ctx, ep, ownerID, req); err != nil {
 		s.log.Error("store request", "err", err)
 		writeErr(w, 500, "could not store request")
 		return
 	}
-	s.log.Info("event", "name", "webhook_received", "endpoint", ep.ID)
-	s.bus.Publish(ownerID, map[string]any{"type": "request", "request": store.RequestSummary{
-		ID: req.ID, EndpointID: ep.ID, Method: req.Method, Path: req.Path, Query: req.Query,
-		ContentType: req.ContentType, Size: req.Size, SourceIP: req.SourceIP, ReceivedAt: req.ReceivedAt,
-	}})
-
-	s.deliver(ctx, ep, ownerID, req, "forward")
 
 	writeJSON(w, 200, map[string]string{"status": "received", "id": req.ID})
 }
@@ -190,4 +183,19 @@ func itoa(n int) string {
 		n /= 10
 	}
 	return string(b[i:])
+}
+
+// ingest stores a captured request, announces it to the owner's dashboard, then forwards it
+// asynchronously. Shared by real webhooks and the dashboard's "Send test webhook" button.
+func (s *Server) ingest(ctx context.Context, ep *store.Endpoint, ownerID string, req *store.Request) error {
+	if err := s.store.InsertRequest(ctx, req); err != nil {
+		return err
+	}
+	s.log.Info("event", "name", "webhook_received", "endpoint", ep.ID)
+	s.bus.Publish(ownerID, map[string]any{"type": "request", "request": store.RequestSummary{
+		ID: req.ID, EndpointID: ep.ID, Method: req.Method, Path: req.Path, Query: req.Query,
+		ContentType: req.ContentType, Size: req.Size, SourceIP: req.SourceIP, ReceivedAt: req.ReceivedAt,
+	}})
+	s.deliver(ctx, ep, ownerID, req, "forward")
+	return nil
 }

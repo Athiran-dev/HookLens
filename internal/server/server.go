@@ -66,6 +66,7 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /api/v1/endpoints/{id}", s.authed(s.handleGetEndpoint))
 	m.HandleFunc("PATCH /api/v1/endpoints/{id}", s.authed(s.handleUpdateEndpoint))
 	m.HandleFunc("DELETE /api/v1/endpoints/{id}", s.authed(s.handleDeleteEndpoint))
+	m.HandleFunc("POST /api/v1/endpoints/{id}/test", s.authed(s.handleSendTest))
 	m.HandleFunc("GET /api/v1/endpoints/{id}/requests", s.authed(s.handleListRequests))
 	m.HandleFunc("GET /api/v1/requests", s.authed(s.handleListRequests))
 	m.HandleFunc("GET /api/v1/requests/{id}", s.authed(s.handleGetRequest))

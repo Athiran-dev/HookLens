@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Shell, { useApp } from "@/components/Shell";
 import { Button, MethodBadge } from "@/components/ui";
+import { useToast } from "@/components/toast";
 import {
   CopyIconButton, EmptyState, LinkAction, Panel, PageHeader, Pill, Segmented, StatusDot, TableWrap, TerminalBlock, Td, Th, tbl,
 } from "@/components/app";
@@ -61,6 +62,7 @@ function Step({ n, done, title, children }: { n: number; done: boolean; title: s
 
 function Overview() {
   const { me, endpoints } = useApp();
+  const toast = useToast();
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [recent, setRecent] = useState<RequestSummary[]>([]);
   const [tunnels, setTunnels] = useState<TunnelInfo[]>([]);
@@ -158,7 +160,11 @@ function Overview() {
             </Step>
             <Step n={3} done={false} title="Send a test webhook">
               {first ? (
-                <TerminalBlock copy={curl} title="curl">{curl}</TerminalBlock>
+                <>
+                  <p className="mb-3 text-sm text-zinc-400">The quickest way: let HookLens send a sample webhook to your endpoint.</p>
+                  <Button onClick={async () => { try { await api("POST", `/api/v1/endpoints/${first.id}/test`, {}); toast("Test webhook sent"); } catch (e) { toast(e instanceof Error ? e.message : "Could not send", "error"); } }}>Send test webhook</Button>
+                  <details className="mt-4 text-sm text-zinc-500"><summary className="cursor-pointer hover:text-zinc-300">Or send one yourself from a terminal</summary><div className="mt-3"><TerminalBlock copy={curl} title="curl">{curl}</TerminalBlock></div></details>
+                </>
               ) : (
                 <p className="text-sm text-zinc-500">Create an endpoint first, then send any HTTP request to its URL.</p>
               )}

@@ -445,3 +445,28 @@ func TestAnalyticsEndpoints(t *testing.T) {
 		t.Fatalf("bad kind: want 400, got %d", code)
 	}
 }
+
+func TestSendTestWebhook(t *testing.T) {
+	e := newEnv(t)
+	u := e.signup()
+	epID, _ := u.createEndpoint("try it")
+
+	code, body := u.call("POST", "/api/v1/endpoints/"+epID+"/test", nil)
+	if code != 201 || body["id"] == nil {
+		t.Fatalf("send test: %d %v", code, body)
+	}
+	_, r := u.call("GET", "/api/v1/requests/"+body["id"].(string), nil)
+	if r["path"] != "/test" || r["method"] != "POST" || !strings.Contains(r["body"].(map[string]any)["body_text"].(string), "payment.captured") {
+		t.Fatalf("test webhook not stored as expected: %v", r)
+	}
+
+	bob := e.signup()
+	if code, _ := bob.call("POST", "/api/v1/endpoints/"+epID+"/test", nil); code != 404 {
+		t.Fatalf("cross-user test webhook: want 404, got %d", code)
+	}
+	off := "inactive"
+	u.call("PATCH", "/api/v1/endpoints/"+epID, map[string]*string{"status": &off})
+	if code, _ := u.call("POST", "/api/v1/endpoints/"+epID+"/test", nil); code != 409 {
+		t.Fatalf("disabled endpoint: want 409, got %d", code)
+	}
+}

@@ -159,7 +159,11 @@ export default function RequestsExplorer({ endpointId, initialQuery = "", initia
               <EmptyState
                 title={filtersActive ? "No requests match" : "No requests yet"}
                 text={filtersActive ? "Try clearing a filter." : "Send a webhook to one of your endpoint URLs and it appears here instantly."}
-              />
+              >
+                {!filtersActive && endpointId && (
+                  <Button onClick={async () => { await api("POST", `/api/v1/endpoints/${endpointId}/test`, {}).catch(() => {}); }}>Send test webhook</Button>
+                )}
+              </EmptyState>
             </li>
           )}
           {list?.map((r) => (

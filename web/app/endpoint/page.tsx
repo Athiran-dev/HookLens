@@ -32,6 +32,14 @@ function Inspector() {
   const listenCmd = `hooklens listen 3000 --endpoint "${endpoint.name}"`;
   const curl = `curl -X POST ${endpoint.hook_url} \\\n  -H "Content-Type: application/json" \\\n  -d '{"event":"test","amount":500}'`;
 
+  async function sendTest() {
+    try {
+      await api("POST", `/api/v1/endpoints/${id}/test`, {});
+      toast("Test webhook sent. It appears below.");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Could not send test webhook", "error");
+    }
+  }
   async function toggle() {
     await api("PATCH", `/api/v1/endpoints/${id}`, { status: endpoint!.status === "active" ? "inactive" : "active" });
     toast(endpoint!.status === "active" ? "Endpoint disabled" : "Endpoint enabled");
@@ -46,6 +54,7 @@ function Inspector() {
   return (
     <>
       <PageHeader crumbs={["Dashboard", "Endpoints", endpoint.name]} title={endpoint.name}>
+        <Button onClick={sendTest}>Send test webhook</Button>
         <Button variant="outline" onClick={toggle}>{endpoint.status === "active" ? "Disable" : "Enable"}</Button>
         <Button variant="danger" onClick={() => setConfirmDelete(true)}>Delete</Button>
       </PageHeader>

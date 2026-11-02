@@ -1,9 +1,12 @@
 package server
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/hooklens/hooklens/internal/auth"
 	"github.com/hooklens/hooklens/internal/store"
 )
 
@@ -62,4 +65,45 @@ func (s *Server) handleDisconnectTunnel(w http.ResponseWriter, r *http.Request, 
 	}
 	t.Kick()
 	writeJSON(w, 200, map[string]bool{"ok": true})
+}
+
+// handleSendTest captures a sample webhook on the user's own endpoint so they can try the product
+// (inspect, forward, replay) without needing curl or a real provider.
+func (s *Server) handleSendTest(w http.ResponseWriter, r *http.Request, u *store.User) {
+	if !s.limiter.Allow("test:"+u.ID, 20.0/60, 10) {
+		writeErr(w, 429, "sending test webhooks too fast, wait a moment")
+		return
+	}
+	ep, err := s.store.EndpointForUser(r.Context(), u.ID, r.PathValue("id"))
+	if err != nil {
+		writeErr(w, 404, "endpoint not found")
+		return
+	}
+	if ep.Status != "active" {
+		writeErr(w, 409, "this endpoint is disabled; enable it first")
+		return
+	}
+	body, _ := json.MarshalIndent(map[string]any{
+		"event":   "payment.captured",
+		"id":      "evt_" + auth.NewPublicToken()[:12],
+		"created": time.Now().Unix(),
+		"payment": map[string]any{"id": "pay_" + auth.NewPublicToken()[:10], "amount": 50000, "currency": "INR", "status": "captured"},
+		"note":    "Sample webhook sent from the HookLens dashboard",
+	}, "", "  ")
+	req := &store.Request{
+		EndpointID: ep.ID, Method: "POST", Path: "/test",
+		Headers: map[string][]string{
+			"Content-Type":    {"application/json"},
+			"User-Agent":      {"HookLens-Dashboard/1.0"},
+			"X-HookLens-Test": {"true"},
+			"Host":            {r.Host},
+		},
+		Body: body, ContentType: "application/json", SourceIP: "HookLens dashboard", Size: len(body),
+	}
+	if err := s.ingest(r.Context(), ep, u.ID, req); err != nil {
+		s.log.Error("send test", "err", err)
+		writeErr(w, 500, "could not send test webhook")
+		return
+	}
+	writeJSON(w, 201, map[string]string{"id": req.ID})
 }
