@@ -71,6 +71,7 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /api/v1/requests/{id}", s.authed(s.handleGetRequest))
 	m.HandleFunc("POST /api/v1/requests/{id}/replay", s.authed(s.handleReplay))
 	m.HandleFunc("GET /api/v1/stats", s.authed(s.handleStats))
+	m.HandleFunc("GET /api/v1/stats/activity", s.authed(s.handleActivity))
 	m.HandleFunc("GET /api/v1/tunnels", s.authed(s.handleTunnels))
 
 	// realtime

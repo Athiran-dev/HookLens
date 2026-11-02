@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/ui";
 
 function Block({ children }: { children: string }) {
-  return <pre className="my-3 overflow-x-auto rounded-md border border-ink-700 bg-ink-900 p-3 text-xs leading-relaxed text-slate-200">{children}</pre>;
+  return <pre className="my-3 overflow-x-auto rounded-md border border-white/10 bg-black/40 p-3 text-xs leading-relaxed text-slate-200">{children}</pre>;
 }
 
 function H({ id, children }: { id: string; children: React.ReactNode }) {

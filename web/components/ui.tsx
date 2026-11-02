@@ -6,11 +6,11 @@ import type { DeliveryBrief } from "@/lib/api";
 export function Logo({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 font-semibold tracking-tight text-white ${className}`}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <circle cx="12" cy="12" r="9" stroke="#34d399" strokeWidth="2" />
-        <path d="M7 12h10M13 8l4 4-4 4" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden style={{ filter: "drop-shadow(0 0 6px rgba(74,222,128,0.45))" }}>
+        <circle cx="12" cy="12" r="9" stroke="#4ade80" strokeWidth="2" />
+        <path d="M7 12h10M13 8l4 4-4 4" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      HookLens
+      <span className="font-display">HookLens</span>
     </span>
   );
 }
@@ -21,15 +21,15 @@ export function Button({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "ghost" | "danger" | "outline" }) {
   const styles = {
-    primary: "bg-brand text-ink-950 hover:bg-emerald-300 font-semibold",
-    ghost: "text-slate-300 hover:bg-ink-700",
-    outline: "border border-ink-600 text-slate-200 hover:bg-ink-700",
-    danger: "border border-red-500/40 text-red-300 hover:bg-red-500/10",
+    primary: "btn-glow bg-brand text-ink-950 font-semibold",
+    ghost: "text-slate-300 hover:bg-white/5",
+    outline: "border border-white/10 bg-white/[0.02] text-slate-200 hover:border-white/20 hover:bg-white/[0.06]",
+    danger: "border border-red-500/30 text-red-300 hover:bg-red-500/10",
   }[variant];
   return (
     <button
       {...props}
-      className={`inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-sm transition disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${className}`}
     />
   );
 }
@@ -38,13 +38,13 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`w-full rounded-md border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand focus:outline-none ${props.className ?? ""}`}
+      className={`w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-slate-100 transition placeholder:text-slate-600 focus:border-brand/70 focus:outline-none focus:ring-2 focus:ring-brand/20 ${props.className ?? ""}`}
     />
   );
 }
 
 export function Card({ className = "", children }: { className?: string; children: React.ReactNode }) {
-  return <div className={`rounded-lg border border-ink-700 bg-ink-800 ${className}`}>{children}</div>;
+  return <div className={`glass rounded-xl ${className}`}>{children}</div>;
 }
 
 export function Spinner() {
@@ -111,7 +111,7 @@ export function DeliveryBadge({ d }: { d: DeliveryBrief | null }) {
 export function PageTitle({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-      <h1 className="text-xl font-semibold text-white">{title}</h1>
+      <h1 className="rise font-display text-2xl font-semibold text-white">{title}</h1>
       <div className="flex items-center gap-2">{children}</div>
     </div>
   );

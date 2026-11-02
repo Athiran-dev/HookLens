@@ -481,3 +481,41 @@ func (s *Store) FailStalePending(ctx context.Context) error {
 		`UPDATE deliveries SET status='failed', error='server restarted before the delivery completed', completed_at=now() WHERE status='pending'`)
 	return err
 }
+
+// ActivityPoint is one hour of traffic for the dashboard chart.
+type ActivityPoint struct {
+	Hour   time.Time `json:"hour"`
+	Total  int       `json:"total"`
+	Failed int       `json:"failed"`
+}
+
+// Activity returns the last 24 hourly buckets (oldest first), zero-filled.
+func (s *Store) Activity(ctx context.Context, userID string) ([]ActivityPoint, error) {
+	rows, err := s.pool.Query(ctx, `
+		SELECT h.hour, coalesce(r.n,0), coalesce(d.n,0)
+		FROM generate_series(date_trunc('hour', now()) - interval '23 hours', date_trunc('hour', now()), interval '1 hour') AS h(hour)
+		LEFT JOIN (
+		  SELECT date_trunc('hour', r.received_at) AS hr, count(*) AS n
+		  FROM requests r JOIN endpoints e ON e.id=r.endpoint_id JOIN workspaces w ON w.id=e.workspace_id
+		  WHERE w.owner_id=$1 AND r.received_at >= date_trunc('hour', now()) - interval '23 hours' GROUP BY 1
+		) r ON r.hr = h.hour
+		LEFT JOIN (
+		  SELECT date_trunc('hour', d.created_at) AS hr, count(*) AS n
+		  FROM deliveries d JOIN requests r ON r.id=d.request_id JOIN endpoints e ON e.id=r.endpoint_id JOIN workspaces w ON w.id=e.workspace_id
+		  WHERE w.owner_id=$1 AND d.status='failed' AND d.created_at >= date_trunc('hour', now()) - interval '23 hours' GROUP BY 1
+		) d ON d.hr = h.hour
+		ORDER BY h.hour`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []ActivityPoint{}
+	for rows.Next() {
+		var p ActivityPoint
+		if err := rows.Scan(&p.Hour, &p.Total, &p.Failed); err != nil {
+			return nil, err
+		}
+		out = append(out, p)
+	}
+	return out, rows.Err()
+}

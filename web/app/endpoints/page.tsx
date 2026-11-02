@@ -65,12 +65,12 @@ function List() {
       ) : (
         <div className="space-y-3">
           {eps.map((e) => (
-            <Card key={e.id} className="p-4">
+            <Card key={e.id} className="rise p-4 transition duration-300 hover:-translate-y-0.5 hover:border-white/15">
               <div className="flex flex-wrap items-center gap-3">
-                <Link href={`/endpoint/?id=${e.id}`} className="text-base font-semibold text-white hover:text-brand">{e.name}</Link>
+                <Link href={`/endpoint/?id=${e.id}`} className="font-display text-lg font-semibold text-white hover:text-brand">{e.name}</Link>
                 {e.status === "inactive" && <span className="rounded bg-slate-500/20 px-1.5 py-0.5 text-xs text-slate-300">disabled</span>}
                 <span className={`inline-flex items-center gap-1.5 text-xs ${e.tunnel_connected ? "text-brand" : "text-slate-500"}`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${e.tunnel_connected ? "bg-brand" : "bg-slate-600"}`} />
+                  {e.tunnel_connected ? <span className="live-dot" /> : <span className="h-2 w-2 rounded-full bg-slate-600" />}
                   {e.tunnel_connected ? "tunnel connected" : "no tunnel"}
                 </span>
                 <span className="ml-auto text-xs text-slate-500">
@@ -78,7 +78,7 @@ function List() {
                 </span>
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <code className="min-w-0 flex-1 truncate rounded bg-ink-900 px-3 py-1.5 text-xs text-slate-300">{e.hook_url}</code>
+                <code className="min-w-0 flex-1 truncate rounded bg-black/40 px-3 py-1.5 font-mono text-xs text-slate-300">{e.hook_url}</code>
                 <CopyButton text={e.hook_url} />
                 <Link href={`/endpoint/?id=${e.id}`}><Button variant="outline" className="!px-2.5 !py-1 text-xs">Inspect</Button></Link>
               </div>

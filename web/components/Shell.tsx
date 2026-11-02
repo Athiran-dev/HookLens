@@ -35,7 +35,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <MeContext.Provider value={{ me, refresh }}>
-      <header className="sticky top-0 z-20 border-b border-ink-700 bg-ink-950/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
           <Link href="/dashboard/">
             <Logo />
@@ -44,7 +44,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {nav.map((n) => {
               const active = path.startsWith(n.href.replace(/\/$/, "")) || (n.href === "/endpoints/" && path.startsWith("/endpoint"));
               return (
-                <Link key={n.href} href={n.href} className={`rounded-md px-3 py-1.5 ${active ? "bg-ink-700 text-white" : "text-slate-400 hover:text-white"}`}>
+                <Link key={n.href} href={n.href} className={`rounded-lg px-3 py-1.5 transition ${active ? "bg-white/[0.07] text-white shadow-[inset_0_-2px_0_0_#4ade80]" : "text-slate-400 hover:bg-white/[0.04] hover:text-white"}`}>
                   {n.label}
                 </Link>
               );

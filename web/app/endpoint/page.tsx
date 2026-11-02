@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Shell from "@/components/Shell";
+import { JsonView } from "@/components/fx";
 import { Button, Card, CopyButton, DeliveryBadge, ErrorNote, Input, MethodBadge, Spinner } from "@/components/ui";
 import {
   api,
@@ -50,7 +51,7 @@ function HeaderTable({ headers }: { headers: Record<string, string[]> | null }) 
 }
 
 function Code({ children }: { children: string }) {
-  return <pre className="max-h-[28rem] overflow-auto whitespace-pre-wrap break-all rounded-md bg-ink-950 p-3 text-xs leading-relaxed text-slate-200">{children}</pre>;
+  return <JsonView text={children} />;
 }
 
 function Detail({ req, onReplay, replaying, replayError }: { req: RequestDetail; onReplay: () => void; replaying: boolean; replayError: string }) {
@@ -177,6 +178,15 @@ function Detail({ req, onReplay, replaying, replayError }: { req: RequestDetail;
   );
 }
 
+function rail(r: RequestSummary): string {
+  switch (r.delivery?.status) {
+    case "delivered": return "border-emerald-400/70";
+    case "failed": return "border-red-400/80";
+    case "pending": return "border-amber-300/80";
+    default: return "border-transparent";
+  }
+}
+
 function Inspector() {
   const params = useSearchParams();
   const id = params.get("id") ?? "";
@@ -190,6 +200,7 @@ function Inspector() {
   const [replaying, setReplaying] = useState(false);
   const [replayError, setReplayError] = useState("");
   const [notFound, setNotFound] = useState(false);
+  const freshIds = useRef(new Set<string>());
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const filtersActive = q !== "" || method !== "" || status !== "";
@@ -237,13 +248,31 @@ function Inspector() {
     if (ev.type === "tunnel" && ev.endpoint_id === id) setEndpoint((e) => (e ? { ...e, tunnel_connected: ev.connected } : e));
     if (ev.type === "request" && ev.request.endpoint_id === id) {
       setEndpoint((e) => (e ? { ...e, request_count: e.request_count + 1 } : e));
-      if (!filtersActive) setList((l) => [ev.request, ...(l ?? [])].slice(0, 100));
+      if (!filtersActive) {
+        freshIds.current.add(ev.request.id);
+        setList((l) => [ev.request, ...(l ?? [])].slice(0, 100));
+      }
     }
     if (ev.type === "delivery" && ev.endpoint_id === id) {
       setList((l) => l?.map((r) => (r.id === ev.request_id ? { ...r, delivery: ev.delivery } : r)) ?? l);
       if (ev.request_id === selectedRef.current) loadDetail(ev.request_id);
     }
   });
+
+  const listRef = useRef(list);
+  listRef.current = list;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA" || e.metaKey || e.ctrlKey) return;
+      const rows = listRef.current ?? [];
+      const i = rows.findIndex((r) => r.id === selectedRef.current);
+      if (e.key === "j" && i < rows.length - 1) setSelected(rows[i + 1].id);
+      if (e.key === "k" && i > 0) setSelected(rows[i - 1].id);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   async function replay() {
     if (!detail) return;
@@ -280,9 +309,9 @@ function Inspector() {
     <>
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Link href="/endpoints/" className="text-sm text-slate-500 hover:text-slate-300">Endpoints /</Link>
-        <h1 className="text-xl font-semibold text-white">{endpoint.name}</h1>
+        <h1 className="font-display text-2xl font-semibold text-white">{endpoint.name}</h1>
         <span className={`inline-flex items-center gap-1.5 text-xs ${endpoint.tunnel_connected ? "text-brand" : "text-slate-500"}`}>
-          <span className={`h-1.5 w-1.5 rounded-full ${endpoint.tunnel_connected ? "bg-brand" : "bg-slate-600"}`} />
+          {endpoint.tunnel_connected ? <span className="live-dot" /> : <span className="h-2 w-2 rounded-full bg-slate-600" />}
           {endpoint.tunnel_connected ? "tunnel connected" : "no tunnel"}
         </span>
         {!connected && <span className="text-xs text-amber-400">live updates reconnecting…</span>}
@@ -308,7 +337,7 @@ function Inspector() {
       <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
         <Card className="h-fit overflow-hidden">
           <div className="space-y-2 border-b border-ink-700 p-3">
-            <Input placeholder="Search path, headers, body…" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input placeholder="Search path, headers, body…  (j / k to move)" value={q} onChange={(e) => setQ(e.target.value)} />
             <div className="flex gap-2">
               <select value={method} onChange={(e) => setMethod(e.target.value)} className="flex-1 rounded-md border border-ink-600 bg-ink-900 px-2 py-1.5 text-xs text-slate-200">
                 <option value="">All methods</option>
@@ -323,7 +352,7 @@ function Inspector() {
               </select>
             </div>
           </div>
-          <ul className="max-h-[32rem] divide-y divide-ink-700 overflow-y-auto">
+          <ul className="max-h-[32rem] divide-y divide-white/5 overflow-y-auto">
             {list === null && <li className="p-6 text-center"><Spinner /></li>}
             {list?.length === 0 && (
               <li className="p-6 text-center text-sm text-slate-500">
@@ -331,8 +360,8 @@ function Inspector() {
               </li>
             )}
             {list?.map((r) => (
-              <li key={r.id}>
-                <button onClick={() => { setSelected(r.id); setReplayError(""); }} className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-ink-700/50 ${selected === r.id ? "bg-ink-700" : ""}`}>
+              <li key={r.id} className={freshIds.current.has(r.id) ? "row-in" : ""}>
+                <button onClick={() => { setSelected(r.id); setReplayError(""); }} className={`flex w-full items-center gap-2 border-l-2 px-3 py-2 text-left text-sm transition hover:bg-white/[0.04] ${rail(r)} ${selected === r.id ? "bg-white/[0.07]" : ""}`}>
                   <MethodBadge method={r.method} />
                   <span className="min-w-0 flex-1 truncate font-mono text-xs text-slate-200">{r.path}</span>
                   <DeliveryBadge d={r.delivery} />
