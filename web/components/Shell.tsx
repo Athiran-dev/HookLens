@@ -36,7 +36,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   return (
     <MeContext.Provider value={{ me, refresh }}>
       <header className="sticky top-0 z-20 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-1 px-4 py-2 sm:h-14 sm:py-0">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-1 px-4 py-2 sm:h-14 sm:py-0">
           <Link href="/dashboard/">
             <Logo />
           </Link>
@@ -64,7 +64,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
     </MeContext.Provider>
   );
 }

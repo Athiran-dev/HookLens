@@ -90,3 +90,8 @@ body::before {
   animation: beam-spin 7s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) { .beam::before { animation: none; } }
+
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.marquee { animation: marquee 32s linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .marquee { animation: none; } }
