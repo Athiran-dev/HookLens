@@ -92,7 +92,7 @@ func parseInterspersed(fs *flag.FlagSet, args []string) []string {
 }
 
 func paint(s, code string) string {
-	if os.Getenv("NO_COLOR") != "" || !isTerminal() || (runtime.GOOS == "windows" && os.Getenv("WT_SESSION") == "" && os.Getenv("TERM") == "") {
+	if os.Getenv("NO_COLOR") != "" || !isTerminal() || !vtEnabled {
 		return s
 	}
 	return "\x1b[" + code + "m" + s + "\x1b[0m"

@@ -262,7 +262,7 @@ func (t *tunnelRunner) forward(ctx context.Context, m proto.Message) proto.Messa
 	}
 	out.DurationMS = int(time.Since(start).Milliseconds())
 	if err != nil {
-		out.Error = "could not reach " + t.target.Host + ": " + shortErr(unwrapURLError(err))
+		out.Error = describeForwardError(t.target, err)
 	}
 	printRequestLine(m.Method, m.Path, out)
 	return out
@@ -298,4 +298,16 @@ func truncate(s string, n int) string {
 		return s
 	}
 	return s[:n-1] + "…"
+}
+
+// describeForwardError turns a low-level dial/HTTP error into something a developer can act on.
+func describeForwardError(target *url.URL, err error) string {
+	msg := strings.ToLower(err.Error())
+	switch {
+	case strings.Contains(msg, "refused") || strings.Contains(msg, "no connection could be made"):
+		return fmt.Sprintf("Connection refused: nothing is listening on %s. Is your app running?", target.Host)
+	case errors.Is(err, context.DeadlineExceeded) || strings.Contains(msg, "timeout") || strings.Contains(msg, "deadline exceeded"):
+		return fmt.Sprintf("Your app at %s did not respond in time (25s limit).", target.Host)
+	}
+	return truncate("Could not reach "+target.Host+": "+unwrapURLError(err).Error(), 240)
 }
