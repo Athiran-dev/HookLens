@@ -32,6 +32,7 @@ Environment: HOOKLENS_SERVER, HOOKLENS_TOKEN override the saved login.
 
 func main() {
 	if len(os.Args) < 2 {
+		printLogo("webhooks on localhost")
 		fmt.Print(usage)
 		os.Exit(2)
 	}
@@ -131,6 +132,7 @@ func cmdLogin(args []string) error {
 	tokenFlag := fs.String("token", "", "use an API key instead of the browser flow")
 	parseInterspersed(fs, args)
 
+	printLogo("login")
 	cfg := loadConfig()
 	if *serverFlag != "" {
 		cfg.Server = strings.TrimRight(*serverFlag, "/")

@@ -7,8 +7,11 @@ const body = Geist({ subsets: ["latin"], variable: "--font-body", display: "swap
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:8080"),
   title: "HookLens - inspect, forward and replay webhooks",
   description: "Receive webhooks on localhost with a public URL, inspect every request, and replay events without triggering them again.",
+  openGraph: { title: "HookLens", description: "Inspect, forward and replay webhooks on localhost.", images: ["/og.png"] },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

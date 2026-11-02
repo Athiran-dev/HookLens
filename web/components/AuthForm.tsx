@@ -32,7 +32,7 @@ function Form({ mode }: { mode: "login" | "signup" }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <Link href="/" className="mb-8">
-        <Logo className="text-xl" />
+        <Logo height={40} />
       </Link>
       <Card className="w-full max-w-sm p-6">
         <h1 className="mb-1 text-lg font-semibold text-white">{signup ? "Create your account" : "Welcome back"}</h1>

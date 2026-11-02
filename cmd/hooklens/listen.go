@@ -98,9 +98,7 @@ func cmdListen(args []string) error {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	fmt.Println()
-	fmt.Println("  HookLens CLI", version)
-	fmt.Println()
+	printLogo("CLI " + version)
 	fmt.Println("  ✓ Authenticated")
 	if conn, err := net.DialTimeout("tcp", target.Host, time.Second); err == nil {
 		conn.Close()

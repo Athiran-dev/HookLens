@@ -24,7 +24,7 @@ export default function Landing() {
       <div className="grid-bg pointer-events-none absolute inset-x-0 top-0 h-[44rem]" aria-hidden />
 
       <header className="relative z-10 mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Logo className="text-lg" />
+        <Logo height={30} />
         <nav className="flex items-center gap-4 whitespace-nowrap text-sm text-slate-400 sm:gap-5">
           <Link href="/docs/" className="hidden transition hover:text-white sm:inline">Docs</Link>
           <Link href="/login/" className="transition hover:text-white">Log in</Link>
@@ -136,7 +136,7 @@ hooklens listen 3000`}</pre>
       </section>
 
       <footer className="relative z-10 border-t border-white/5 py-10 text-center text-sm text-slate-500">
-        <Logo className="text-sm" /> · <Link href="/docs/" className="hover:text-slate-300">Docs</Link> · <Link href="/login/" className="hover:text-slate-300">Log in</Link>
+        <Logo height={22} /> · <Link href="/docs/" className="hover:text-slate-300">Docs</Link> · <Link href="/login/" className="hover:text-slate-300">Log in</Link>
       </footer>
     </div>
   );

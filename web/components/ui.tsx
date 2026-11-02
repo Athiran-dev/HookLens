@@ -3,15 +3,18 @@
 import { useState } from "react";
 import type { DeliveryBrief } from "@/lib/api";
 
-export function Logo({ className = "" }: { className?: string }) {
+/** The HookLens lockup (mark + wordmark). The app is dark-themed, so it uses the white artwork. */
+export function Logo({ height = 26, markOnly = false, className = "" }: { height?: number; markOnly?: boolean; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-2 font-semibold tracking-tight text-white ${className}`}>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden style={{ filter: "drop-shadow(0 0 6px rgba(74,222,128,0.45))" }}>
-        <circle cx="12" cy="12" r="9" stroke="#4ade80" strokeWidth="2" />
-        <path d="M7 12h10M13 8l4 4-4 4" stroke="#4ade80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span className="font-display">HookLens</span>
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={markOnly ? "/mark-white.png" : "/logo-white.png"}
+      alt="HookLens"
+      height={height}
+      style={{ height, width: "auto" }}
+      className={`inline-block select-none drop-shadow-[0_0_10px_rgba(74,222,128,0.18)] ${className}`}
+      draggable={false}
+    />
   );
 }
 
