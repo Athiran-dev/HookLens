@@ -36,11 +36,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   return (
     <MeContext.Provider value={{ me, refresh }}>
       <header className="sticky top-0 z-20 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-1 px-4 py-2 sm:h-14 sm:py-0">
           <Link href="/dashboard/">
             <Logo />
           </Link>
-          <nav className="flex gap-1 text-sm">
+          <nav className="order-3 -mx-1 flex w-full gap-1 overflow-x-auto text-sm sm:order-none sm:mx-0 sm:w-auto">
             {nav.map((n) => {
               const active = path.startsWith(n.href.replace(/\/$/, "")) || (n.href === "/endpoints/" && path.startsWith("/endpoint"));
               return (

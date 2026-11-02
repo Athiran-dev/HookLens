@@ -334,16 +334,16 @@ function Inspector() {
         )}
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-[22rem_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <Card className="h-fit overflow-hidden">
           <div className="space-y-2 border-b border-ink-700 p-3">
             <Input placeholder="Search path, headers, body…  (j / k to move)" value={q} onChange={(e) => setQ(e.target.value)} />
             <div className="flex gap-2">
-              <select value={method} onChange={(e) => setMethod(e.target.value)} className="flex-1 rounded-md border border-ink-600 bg-ink-900 px-2 py-1.5 text-xs text-slate-200">
+              <select value={method} onChange={(e) => setMethod(e.target.value)} className="flex-1 rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs text-slate-200">
                 <option value="">All methods</option>
                 {["GET", "POST", "PUT", "PATCH", "DELETE"].map((m) => <option key={m}>{m}</option>)}
               </select>
-              <select value={status} onChange={(e) => setStatus(e.target.value)} className="flex-1 rounded-md border border-ink-600 bg-ink-900 px-2 py-1.5 text-xs text-slate-200">
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className="flex-1 rounded-md border border-white/10 bg-black/30 px-2 py-1.5 text-xs text-slate-200">
                 <option value="">All results</option>
                 <option value="delivered">Delivered</option>
                 <option value="failed">Failed</option>
@@ -372,7 +372,7 @@ function Inspector() {
           </ul>
         </Card>
 
-        <Card className="min-h-[20rem] p-4">
+        <Card className="min-h-[20rem] min-w-0 p-4">
           {detail ? (
             <Detail req={detail} onReplay={replay} replaying={replaying} replayError={replayError} />
           ) : (

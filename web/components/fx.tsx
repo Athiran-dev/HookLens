@@ -94,7 +94,7 @@ export function PipelineHero() {
   const route = "M 95 110 L 330 110 L 565 110";
   const dots = [0, 1.4, 2.8];
   return (
-    <svg viewBox="0 0 660 220" className="mx-auto w-full max-w-3xl" role="img" aria-label="A webhook travels from a provider through HookLens to your localhost, and can be replayed">
+    <svg viewBox="0 0 660 225" className="mx-auto w-full max-w-3xl" role="img" aria-label="A webhook travels from a provider through HookLens to your localhost, and can be replayed">
       <defs>
         <linearGradient id="beam" x1="0" x2="1">
           <stop offset="0" stopColor="#4ade80" stopOpacity="0" />
@@ -108,7 +108,7 @@ export function PipelineHero() {
       </defs>
       <path d={route} stroke="url(#beam)" strokeWidth="2" fill="none" strokeDasharray="2 7" />
       <path d="M 565 128 C 565 200, 330 200, 330 130" stroke="rgba(251,191,36,0.35)" strokeWidth="1.5" fill="none" strokeDasharray="4 6" />
-      <text x="460" y="205" fill="#fbbf24" fillOpacity="0.8" fontSize="11" textAnchor="middle" fontFamily="var(--font-mono)">replay</text>
+      <text x="448" y="212" fill="#fbbf24" fillOpacity="0.8" fontSize="14" textAnchor="middle" fontFamily="var(--font-mono)">replay</text>
       {dots.map((d) => (
         <circle key={d} r="5" fill="#4ade80" filter="url(#glow)">
           <animateMotion dur="4.2s" begin={`${d}s`} repeatCount="indefinite" path={route} keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.25 1" />
@@ -124,8 +124,8 @@ export function PipelineHero() {
           <circle cx={n.x} cy="110" r="22" fill="#0c0e12" stroke={i === 1 ? "#4ade80" : "rgba(255,255,255,0.18)"} strokeWidth="1.5" />
           {i === 1 && <circle cx={n.x} cy="110" r="30" fill="none" stroke="#4ade80" strokeOpacity="0.25" />}
           <circle cx={n.x} cy="110" r="5" fill={i === 1 ? "#4ade80" : "#94a3b8"} />
-          <text x={n.x} y="62" textAnchor="middle" fill="#e2e8f0" fontSize="12.5" fontWeight="600" fontFamily="var(--font-display)">{n.label}</text>
-          <text x={n.x} y="78" textAnchor="middle" fill="#64748b" fontSize="10.5" fontFamily="var(--font-mono)">{n.sub}</text>
+          <text x={n.x} y="58" textAnchor="middle" fill="#e2e8f0" fontSize="17" fontWeight="600" fontFamily="var(--font-display)">{n.label}</text>
+          <text x={n.x} y="78" textAnchor="middle" fill="#7b8798" fontSize="13" fontFamily="var(--font-mono)">{n.sub}</text>
         </g>
       ))}
     </svg>

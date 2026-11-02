@@ -61,7 +61,7 @@ function Overview() {
   return (
     <>
       <PageTitle title="Overview" />
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5 [&>*:last-child]:col-span-2 md:[&>*:last-child]:col-span-1">
         <Stat i={0} label="Endpoints" value={stats?.endpoints ?? "–"} />
         <Stat i={1} label="Requests" value={stats?.requests ?? "–"} />
         <Stat i={2} label="Delivered" value={stats?.delivered ?? "–"} tone="text-emerald-300" />

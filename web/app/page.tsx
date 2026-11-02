@@ -25,10 +25,10 @@ export default function Landing() {
 
       <header className="relative z-10 mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Logo className="text-lg" />
-        <nav className="flex items-center gap-5 text-sm text-slate-400">
-          <Link href="/docs/" className="transition hover:text-white">Docs</Link>
+        <nav className="flex items-center gap-4 whitespace-nowrap text-sm text-slate-400 sm:gap-5">
+          <Link href="/docs/" className="hidden transition hover:text-white sm:inline">Docs</Link>
           <Link href="/login/" className="transition hover:text-white">Log in</Link>
-          <Link href="/signup/" className="btn-glow rounded-lg bg-brand px-4 py-1.5 font-semibold text-ink-950">Get started free</Link>
+          <Link href="/signup/" className="btn-glow rounded-lg bg-brand px-3.5 py-1.5 font-semibold text-ink-950 sm:px-4">Get started<span className="hidden sm:inline"> free</span></Link>
         </nav>
       </header>
 
