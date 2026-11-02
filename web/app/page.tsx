@@ -37,7 +37,6 @@ export default function Landing() {
   return (
     <div className="relative min-h-screen overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
-        <div className="grid-bg absolute inset-0" />
         <div className="grid-hero absolute inset-x-0 top-0 h-[54rem]" />
         <svg className="absolute right-0 top-0 h-[44rem] w-[72rem] max-w-full" viewBox="0 0 1150 700" fill="none" preserveAspectRatio="xMaxYMin slice">
           <defs>
