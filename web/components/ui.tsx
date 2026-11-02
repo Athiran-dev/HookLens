@@ -12,7 +12,7 @@ export function Logo({ height = 26, markOnly = false, className = "" }: { height
       alt="HookLens"
       height={height}
       style={{ height, width: "auto" }}
-      className={`inline-block select-none drop-shadow-[0_0_10px_rgba(74,222,128,0.18)] ${className}`}
+      className={`inline-block select-none ${className}`}
       draggable={false}
     />
   );
@@ -81,9 +81,9 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
 
 const methodColors: Record<string, string> = {
   GET: "text-sky-300 bg-sky-400/10",
-  POST: "text-emerald-300 bg-emerald-400/10",
-  PUT: "text-amber-300 bg-amber-400/10",
-  PATCH: "text-amber-300 bg-amber-400/10",
+  POST: "text-orange-300 bg-orange-400/10",
+  PUT: "text-violet-300 bg-violet-400/10",
+  PATCH: "text-violet-300 bg-violet-400/10",
   DELETE: "text-red-300 bg-red-400/10",
 };
 

@@ -5,8 +5,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: { 950: "#07080a", 900: "#0c0e12", 800: "#11141a", 700: "#191d25", 600: "#262b36" },
-        brand: { DEFAULT: "#4ade80", dim: "#22c55e" },
+        ink: { 950: "#0a0a0b", 900: "#101012", 800: "#141416", 700: "#1d1d20", 600: "#2a2a2e" },
+        brand: { DEFAULT: "#ef6a2b", dim: "#d9561b", soft: "#f58a54" },
       },
       fontFamily: {
         sans: ["var(--font-body)", "ui-sans-serif", "system-ui", "sans-serif"],

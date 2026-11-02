@@ -44,7 +44,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {nav.map((n) => {
               const active = path.startsWith(n.href.replace(/\/$/, "")) || (n.href === "/endpoints/" && path.startsWith("/endpoint"));
               return (
-                <Link key={n.href} href={n.href} className={`rounded-lg px-3 py-1.5 transition ${active ? "bg-white/[0.07] text-white shadow-[inset_0_-2px_0_0_#4ade80]" : "text-slate-400 hover:bg-white/[0.04] hover:text-white"}`}>
+                <Link key={n.href} href={n.href} className={`rounded-lg px-3 py-1.5 transition ${active ? "bg-white/[0.07] text-white shadow-[inset_0_-2px_0_0_#ef6a2b]" : "text-slate-400 hover:bg-white/[0.04] hover:text-white"}`}>
                   {n.label}
                 </Link>
               );

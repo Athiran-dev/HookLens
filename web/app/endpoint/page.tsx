@@ -310,7 +310,7 @@ function Inspector() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Link href="/endpoints/" className="text-sm text-slate-500 hover:text-slate-300">Endpoints /</Link>
         <h1 className="font-display text-2xl font-semibold text-white">{endpoint.name}</h1>
-        <span className={`inline-flex items-center gap-1.5 text-xs ${endpoint.tunnel_connected ? "text-brand" : "text-slate-500"}`}>
+        <span className={`inline-flex items-center gap-1.5 text-xs ${endpoint.tunnel_connected ? "text-emerald-400" : "text-slate-500"}`}>
           {endpoint.tunnel_connected ? <span className="live-dot" /> : <span className="h-2 w-2 rounded-full bg-slate-600" />}
           {endpoint.tunnel_connected ? "tunnel connected" : "no tunnel"}
         </span>

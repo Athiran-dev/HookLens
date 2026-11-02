@@ -69,7 +69,7 @@ function List() {
               <div className="flex flex-wrap items-center gap-3">
                 <Link href={`/endpoint/?id=${e.id}`} className="font-display text-lg font-semibold text-white hover:text-brand">{e.name}</Link>
                 {e.status === "inactive" && <span className="rounded bg-slate-500/20 px-1.5 py-0.5 text-xs text-slate-300">disabled</span>}
-                <span className={`inline-flex items-center gap-1.5 text-xs ${e.tunnel_connected ? "text-brand" : "text-slate-500"}`}>
+                <span className={`inline-flex items-center gap-1.5 text-xs ${e.tunnel_connected ? "text-emerald-400" : "text-slate-500"}`}>
                   {e.tunnel_connected ? <span className="live-dot" /> : <span className="h-2 w-2 rounded-full bg-slate-600" />}
                   {e.tunnel_connected ? "tunnel connected" : "no tunnel"}
                 </span>
