@@ -1,0 +1,18 @@
+# Render Blueprint: New > Blueprint > pick this repository, then paste DATABASE_URL when asked.
+# Region is Singapore to sit next to the Neon database; change both together if you move.
+services:
+  - type: web
+    name: hooklens
+    runtime: docker
+    region: singapore
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL        # your Neon connection string (direct, not pooled); entered in the dashboard
+        sync: false
+      - key: ADMIN_EMAILS        # comma-separated emails allowed to read feedback at /admin/
+        sync: false
+      - key: TRUST_PROXY         # use the X-Forwarded-For header Render adds
+        value: "true"
+      - key: SECURE_COOKIES      # the site is served over HTTPS
+        value: "true"

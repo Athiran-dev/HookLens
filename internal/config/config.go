@@ -33,7 +33,7 @@ func Load() (*Config, error) {
 	c := &Config{
 		Addr:                listenAddr(),
 		DatabaseURL:         str("DATABASE_URL", ""),
-		PublicURL:           strings.TrimRight(str("PUBLIC_URL", "http://localhost:8080"), "/"),
+		PublicURL:           strings.TrimRight(str("PUBLIC_URL", defaultPublicURL()), "/"),
 		WebOrigin:           strings.TrimRight(str("WEB_ORIGIN", ""), "/"),
 		StaticDir:           str("STATIC_DIR", "web/out"),
 		MaxBodyBytes:        int64(num("MAX_BODY_BYTES", 1<<20)),
@@ -119,4 +119,13 @@ func listenAddr() string {
 		return ":" + p
 	}
 	return ":8080"
+}
+
+// defaultPublicURL is the address shown to users when PUBLIC_URL is not set. Render injects
+// RENDER_EXTERNAL_URL with the service address, so a Render deploy needs no extra setting.
+func defaultPublicURL() string {
+	if v := os.Getenv("RENDER_EXTERNAL_URL"); v != "" {
+		return v
+	}
+	return "http://localhost:8080"
 }
