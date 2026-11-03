@@ -1,4 +1,4 @@
-module github.com/hooklens/hooklens
+module github.com/Athiran-dev/HookLens
 
 go 1.26.0
 

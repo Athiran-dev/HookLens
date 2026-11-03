@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hooklens/hooklens/internal/auth"
-	"github.com/hooklens/hooklens/internal/store"
+	"github.com/Athiran-dev/HookLens/internal/auth"
+	"github.com/Athiran-dev/HookLens/internal/store"
 )
 
 func (s *Server) handleStats(w http.ResponseWriter, r *http.Request, u *store.User) {

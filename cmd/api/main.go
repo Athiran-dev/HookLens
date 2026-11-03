@@ -8,9 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/hooklens/hooklens/internal/config"
-	"github.com/hooklens/hooklens/internal/server"
-	"github.com/hooklens/hooklens/internal/store"
+	"github.com/Athiran-dev/HookLens/internal/config"
+	"github.com/Athiran-dev/HookLens/internal/server"
+	"github.com/Athiran-dev/HookLens/internal/store"
 )
 
 func main() {

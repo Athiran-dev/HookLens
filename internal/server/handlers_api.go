@@ -9,8 +9,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/hooklens/hooklens/internal/auth"
-	"github.com/hooklens/hooklens/internal/store"
+	"github.com/Athiran-dev/HookLens/internal/auth"
+	"github.com/Athiran-dev/HookLens/internal/store"
 )
 
 // ---------- redaction & body rendering ----------

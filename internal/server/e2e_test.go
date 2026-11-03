@@ -17,11 +17,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Athiran-dev/HookLens/internal/config"
+	"github.com/Athiran-dev/HookLens/internal/proto"
+	"github.com/Athiran-dev/HookLens/internal/store"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
-	"github.com/hooklens/hooklens/internal/config"
-	"github.com/hooklens/hooklens/internal/proto"
-	"github.com/hooklens/hooklens/internal/store"
 )
 
 // Full-system test: real Postgres, real HTTP server, a fake CLI tunnel and a fake "localhost" app.

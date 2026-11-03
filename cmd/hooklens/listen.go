@@ -16,9 +16,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Athiran-dev/HookLens/internal/proto"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
-	"github.com/hooklens/hooklens/internal/proto"
 )
 
 const (

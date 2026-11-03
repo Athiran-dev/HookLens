@@ -60,3 +60,17 @@ Then publish CLI binaries with the `release-cli` GitHub workflow (tag `v0.1.0`; 
 ## Scope / not built yet
 
 Email password reset and GitHub sign-in (need an email provider / OAuth app), teams, billing, Redis-backed durable dispatch queue, provider signature verification. Dispatch is an in-memory bounded queue; a server restart marks in-flight deliveries failed (the request itself is always stored and replayable).
+
+## Install the CLI
+
+Download the file for your system from the [latest release](https://github.com/Athiran-dev/HookLens/releases/latest)
+(`hooklens-windows-amd64.exe`, `hooklens-darwin-arm64`, `hooklens-linux-amd64`, ...), rename it to `hooklens`
+(`hooklens.exe` on Windows) and put it on your PATH. Or, with Go installed:
+
+```
+go install github.com/Athiran-dev/HookLens/cmd/hooklens@latest
+```
+
+Then `hooklens login` and `hooklens listen 3000`. Release binaries talk to the hosted service by default; use
+`--server` (or `HOOKLENS_SERVER`) to point the CLI at your own deployment, for example `http://localhost:8080`.
+Releases are unsigned, so Windows SmartScreen may warn on first run ("More info", then "Run anyway").

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hooklens/hooklens/internal/hub"
-	"github.com/hooklens/hooklens/internal/proto"
-	"github.com/hooklens/hooklens/internal/store"
+	"github.com/Athiran-dev/HookLens/internal/hub"
+	"github.com/Athiran-dev/HookLens/internal/proto"
+	"github.com/Athiran-dev/HookLens/internal/store"
 )
 
 // handleHook is the public ingestion endpoint. It captures first, acknowledges quickly, and

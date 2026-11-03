@@ -35,10 +35,10 @@ export default function Docs() {
         </ol>
 
         <H id="install">Install the CLI</H>
-        <p>Download the binary for your OS from the project&apos;s GitHub Releases page, put it on your PATH, and check it:</p>
+        <p>Download the file for your system from <a href="https://github.com/Athiran-dev/HookLens/releases/latest" className="text-brand hover:underline">GitHub Releases</a> (on Windows: <code>hooklens-windows-amd64.exe</code>), rename it to <code>hooklens</code> (<code>hooklens.exe</code> on Windows), put it on your PATH, and check it:</p>
         <Block>{`hooklens version`}</Block>
         <p>Building from source (needs Go):</p>
-        <Block>{`go install github.com/hooklens/hooklens/cmd/hooklens@latest`}</Block>
+        <Block>{`go install github.com/Athiran-dev/HookLens/cmd/hooklens@latest`}</Block>
 
         <H id="cli">CLI reference</H>
         <Block>{`hooklens login [--server URL] [--token KEY]   authenticate (browser flow, or an API key)

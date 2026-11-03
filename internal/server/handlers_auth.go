@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hooklens/hooklens/internal/auth"
-	"github.com/hooklens/hooklens/internal/store"
+	"github.com/Athiran-dev/HookLens/internal/auth"
+	"github.com/Athiran-dev/HookLens/internal/store"
 )
 
 const sessionTTL = 30 * 24 * time.Hour

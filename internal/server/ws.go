@@ -8,10 +8,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/Athiran-dev/HookLens/internal/hub"
+	"github.com/Athiran-dev/HookLens/internal/proto"
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
-	"github.com/hooklens/hooklens/internal/hub"
-	"github.com/hooklens/hooklens/internal/proto"
 )
 
 // Close code sent to a CLI whose tunnel was taken over by a newer connection to the same endpoint.

@@ -90,8 +90,8 @@ function Tunnels() {
           <ol className="space-y-5">
             <li>
               <div className="mb-2 text-[13px] font-medium text-zinc-300">1. Install the CLI</div>
-              <TerminalBlock copy="go install github.com/hooklens/hooklens/cmd/hooklens@latest">{`$ go install github.com/hooklens/hooklens/cmd/hooklens@latest`}</TerminalBlock>
-              <p className="mt-1.5 text-xs text-zinc-600">Or download a binary for your OS from GitHub Releases.</p>
+              <TerminalBlock copy="go install github.com/Athiran-dev/HookLens/cmd/hooklens@latest">{`$ go install github.com/Athiran-dev/HookLens/cmd/hooklens@latest`}</TerminalBlock>
+              <p className="mt-1.5 text-xs text-zinc-600">No Go? <a href="https://github.com/Athiran-dev/HookLens/releases/latest" target="_blank" rel="noreferrer" className="text-brand hover:underline">Download a ready-made binary</a> for Windows, macOS or Linux.</p>
             </li>
             <li>
               <div className="mb-2 text-[13px] font-medium text-zinc-300">2. Log in</div>

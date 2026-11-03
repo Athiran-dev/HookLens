@@ -15,9 +15,11 @@ import (
 
 // defaultServer can be overridden at build time:
 //
-//	go build -ldflags "-X main.defaultServer=https://hooklens.example.com -X main.version=1.0.0"
+//	go build -ldflags "-X main.defaultServer=https://your-host.example -X main.version=1.0.0"
+//
+// For local development point the CLI at your own server with HOOKLENS_SERVER or --server.
 var (
-	defaultServer = "http://localhost:8080"
+	defaultServer = "https://hooklens-app.onrender.com"
 	version       = "dev"
 )
 

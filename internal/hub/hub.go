@@ -11,7 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/hooklens/hooklens/internal/proto"
+	"github.com/Athiran-dev/HookLens/internal/proto"
 )
 
 var (

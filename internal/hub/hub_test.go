@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hooklens/hooklens/internal/proto"
+	"github.com/Athiran-dev/HookLens/internal/proto"
 )
 
 func TestDispatchAndResponseMatchesDeliveryID(t *testing.T) {

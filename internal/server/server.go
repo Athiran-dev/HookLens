@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hooklens/hooklens/internal/auth"
-	"github.com/hooklens/hooklens/internal/config"
-	"github.com/hooklens/hooklens/internal/hub"
-	"github.com/hooklens/hooklens/internal/ratelimit"
-	"github.com/hooklens/hooklens/internal/store"
+	"github.com/Athiran-dev/HookLens/internal/auth"
+	"github.com/Athiran-dev/HookLens/internal/config"
+	"github.com/Athiran-dev/HookLens/internal/hub"
+	"github.com/Athiran-dev/HookLens/internal/ratelimit"
+	"github.com/Athiran-dev/HookLens/internal/store"
 )
 
 const sessionCookie = "hl_session"
