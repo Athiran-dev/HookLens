@@ -31,8 +31,9 @@ export default function Docs() {
           <li>Install the CLI (see below) and run <code>hooklens login</code>. Your browser opens to approve the login.</li>
           <li>Start your app (for example on port 3000) and run <code>hooklens listen 3000</code>.</li>
           <li>Paste the public URL into your provider&apos;s webhook settings (Razorpay, Stripe, GitHub, anything that sends HTTP).</li>
-          <li>Trigger an event. It appears live in the dashboard and is forwarded to your local server.</li>
+          <li>Trigger an event, or press <strong>Send test webhook</strong> on the endpoint page. It appears live in the dashboard and is forwarded to your local server.</li>
         </ol>
+        <p className="mt-3 text-slate-400">HookLens runs on a free plan that sleeps when idle, so the first request after a quiet period can take up to a minute while it wakes up.</p>
 
         <H id="install">Install the CLI</H>
         <p>Download the file for your system from <a href="https://github.com/Athiran-dev/HookLens/releases/latest" className="text-brand hover:underline">GitHub Releases</a> (on Windows: <code>hooklens-windows-amd64.exe</code>), rename it to <code>hooklens</code> (<code>hooklens.exe</code> on Windows), put it on your PATH, and check it:</p>
@@ -69,6 +70,44 @@ hooklens version`}</Block>
           <li>The dashboard masks <code>Authorization</code>, <code>Cookie</code> and API-key headers. Anyone who knows an endpoint URL can send requests to it, so keep it private; you can disable or delete an endpoint at any time.</li>
           <li>Do not send real production secrets or regulated data through a beta service.</li>
         </ul>
+
+        <H id="account">Your account</H>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>There is no password reset yet.</strong> Choose a password you will remember or keep it in a password manager. If you are locked out, open an issue on <a href="https://github.com/Athiran-dev/HookLens/issues" className="text-brand hover:underline">GitHub</a> and describe the problem without posting your password.</li>
+          <li>In <strong>Settings</strong> you can change the retention period, create API keys, log out of all sessions, and delete your account.</li>
+          <li>Deleting your account erases your endpoints and every captured request immediately. It cannot be undone.</li>
+        </ul>
+
+        <H id="troubleshooting">Troubleshooting</H>
+        <div className="space-y-4">
+          <div>
+            <p className="font-medium text-white">&ldquo;Connection refused: nothing is listening on localhost:3000&rdquo;</p>
+            <p>Your app is not running on that port. Start it, or give <code>hooklens listen</code> the right port. The request was still saved, so replay it once your app is up.</p>
+          </div>
+          <div>
+            <p className="font-medium text-white">Requests show &ldquo;Not forwarded&rdquo;</p>
+            <p>No CLI is connected to that endpoint. Run <code>hooklens listen</code> and check the Tunnels page. Only one CLI forwards an endpoint at a time: starting a second one replaces the first, and <em>Disconnect</em> on the Tunnels page stops that CLI, which then does not reconnect on its own.</p>
+          </div>
+          <div>
+            <p className="font-medium text-white">The first request is slow or times out</p>
+            <p>The free host was asleep and needs about a minute to wake. Retry, or resend the event from your provider&apos;s dashboard.</p>
+          </div>
+          <div>
+            <p className="font-medium text-white">&ldquo;Invalid email or password&rdquo;</p>
+            <p>Check both, and make sure you have signed up on this server. See <a href="#account" className="text-brand hover:underline">Your account</a> for password help.</p>
+          </div>
+          <div>
+            <p className="font-medium text-white">My signature check fails locally</p>
+            <p>HookLens forwards the exact bytes it received. Verify against the raw body, before any JSON parsing, using the signing secret for that provider. Events sent with <em>Send test webhook</em> are not signed by any provider.</p>
+          </div>
+          <div>
+            <p className="font-medium text-white">Windows warns about the CLI download</p>
+            <p>Releases are unsigned. Choose <em>More info</em>, then <em>Run anyway</em>.</p>
+          </div>
+        </div>
+
+        <H id="help">Getting help</H>
+        <p>Use <strong>Send feedback</strong> in the dashboard menu, or open an issue on <a href="https://github.com/Athiran-dev/HookLens/issues" className="text-brand hover:underline">GitHub</a>. HookLens is in beta, so expect rough edges.</p>
 
         <H id="api">API</H>
         <p>The dashboard and CLI use the same JSON API under <code>/api/v1</code>. Authenticate with <code>Authorization: Bearer hlk_…</code> (create keys in Settings).</p>
