@@ -14,6 +14,8 @@ function Form({ mode }: { mode: "login" | "signup" }) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const signup = mode === "signup";
+  // keep the redirect target (for example the CLI authorisation page) when switching between login and signup
+  const otherHref = `${signup ? "/login/" : "/signup/"}${next ? `?next=${encodeURIComponent(next)}` : ""}`;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,7 +49,16 @@ function Form({ mode }: { mode: "login" | "signup" }) {
             <Input id="password" type="password" required minLength={8} maxLength={72} autoComplete={signup ? "new-password" : "current-password"} value={password} onChange={(e) => setPassword(e.target.value)} />
             {signup && <p className="mt-1 text-xs text-slate-500">At least 8 characters.</p>}
           </div>
-          {error && <ErrorNote>{error}</ErrorNote>}
+          {error && (
+            <ErrorNote>
+              {error}
+              {!signup && /invalid email/i.test(error) && (
+                <>
+                  {" "}New to this site? Accounts are not shared between servers, so you may need to <Link className="underline" href={otherHref}>create an account</Link> first.
+                </>
+              )}
+            </ErrorNote>
+          )}
           <Button type="submit" disabled={busy} className="w-full">
             {busy ? "Please wait…" : signup ? "Create account" : "Log in"}
           </Button>
@@ -55,7 +66,7 @@ function Form({ mode }: { mode: "login" | "signup" }) {
       </Card>
       <p className="mt-5 text-sm text-slate-400">
         {signup ? "Already have an account? " : "New to HookLens? "}
-        <Link className="text-brand hover:underline" href={signup ? "/login/" : "/signup/"}>
+        <Link className="text-brand hover:underline" href={otherHref}>
           {signup ? "Log in" : "Sign up free"}
         </Link>
       </p>
