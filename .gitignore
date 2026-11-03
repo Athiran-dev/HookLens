@@ -7,3 +7,7 @@ web/out/
 *.exe
 web/npm-install.log
 web/*.tsbuildinfo
+
+# every local env file except the template (may hold database passwords)
+.env.*
+!.env.example
