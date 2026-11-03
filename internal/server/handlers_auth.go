@@ -125,6 +125,7 @@ func (s *Server) handleMe(w http.ResponseWriter, r *http.Request, u *store.User)
 	n, _ := s.store.CountSessions(r.Context(), u.ID)
 	writeJSON(w, 200, map[string]any{
 		"user":            u,
+		"is_admin":        s.isAdmin(u),
 		"active_sessions": n,
 		"limits": map[string]any{
 			"max_endpoints":  s.cfg.MaxEndpointsPerUser,

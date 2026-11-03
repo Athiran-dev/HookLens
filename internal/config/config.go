@@ -24,6 +24,7 @@ type Config struct {
 	TrustProxy          bool
 	SecureCookies       bool
 	AllowSignup         bool
+	AdminEmails         []string // accounts that can read feedback in the dashboard
 }
 
 // Load reads .env (if present) without overriding real environment variables, then builds the Config.
@@ -43,6 +44,7 @@ func Load() (*Config, error) {
 		TrustProxy:          boolean("TRUST_PROXY", false),
 		SecureCookies:       boolean("SECURE_COOKIES", false),
 		AllowSignup:         boolean("ALLOW_SIGNUP", true),
+		AdminEmails:         splitList(str("ADMIN_EMAILS", "")),
 	}
 	if c.DatabaseURL == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required (see .env.example)")
@@ -96,4 +98,14 @@ func LoadDotEnv(path string) {
 			os.Setenv(k, v)
 		}
 	}
+}
+
+func splitList(v string) []string {
+	var out []string
+	for _, p := range strings.Split(v, ",") {
+		if p = strings.ToLower(strings.TrimSpace(p)); p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }

@@ -6,9 +6,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { api, useLive, useMe, type Endpoint, type MeResponse } from "@/lib/api";
 import { Logo, Spinner } from "@/components/ui";
 import {
-  IconBolt, IconBook, IconCode, IconCog, IconHome, IconKey, IconList, IconMenu, IconPlus, IconReplay, IconSearch, IconX,
+  IconBolt, IconBook, IconChat, IconCode, IconCog, IconHome, IconKey, IconList, IconMenu, IconPlus, IconReplay, IconSearch, IconX,
 } from "@/components/icons";
 import CommandPalette from "@/components/CommandPalette";
+import FeedbackDialog from "@/components/FeedbackDialog";
 import { ToastProvider } from "@/components/toast";
 
 type AppCtx = {
@@ -17,6 +18,7 @@ type AppCtx = {
   endpoints: Endpoint[] | null;
   reloadEndpoints: () => Promise<void>;
   openPalette: () => void;
+  openFeedback: () => void;
 };
 const Ctx = createContext<AppCtx | null>(null);
 export const useApp = () => {
@@ -41,6 +43,7 @@ const nav = [
   ] },
   { group: "Resources", items: [
     { href: "/docs/", label: "Documentation", icon: IconBook },
+    { href: "#feedback", label: "Send feedback", icon: IconChat },
   ] },
 ];
 
@@ -52,7 +55,8 @@ function isActive(path: string, href: string) {
 
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
-  const { me, endpoints } = useApp();
+  const { me, endpoints, openFeedback } = useApp();
+  const groups = nav.map((g) => (g.group === "Configuration" && me.is_admin ? { ...g, items: [...g.items, { href: "/admin/", label: "Admin", icon: IconList }] } : g));
   const used = endpoints?.length ?? 0;
   const max = me.limits.max_endpoints;
   return (
@@ -65,12 +69,20 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         Personal Workspace
       </div>
       <nav className="flex-1 space-y-5 overflow-y-auto px-3">
-        {nav.map((g) => (
+        {groups.map((g) => (
           <div key={g.group}>
             <div className="mb-1.5 px-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-600">{g.group}</div>
             {g.items.map((n) => {
               const active = isActive(path, n.href);
               const Icon = n.icon;
+              if (n.href === "#feedback") {
+                return (
+                  <button key={n.href} onClick={() => { onNavigate?.(); openFeedback(); }} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-zinc-400 transition hover:bg-white/[0.04] hover:text-zinc-100">
+                    <Icon />
+                    {n.label}
+                  </button>
+                );
+              }
               return (
                 <Link
                   key={n.href}
@@ -164,6 +176,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const [endpoints, setEndpoints] = useState<Endpoint[] | null>(null);
   const [drawer, setDrawer] = useState(false);
   const [palette, setPalette] = useState(false);
+  const [feedback, setFeedback] = useState(false);
   const path = usePathname();
 
   const reloadEndpoints = useCallback(async () => {
@@ -195,7 +208,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => (me ? { me, refresh, endpoints, reloadEndpoints, openPalette: () => setPalette(true) } : null),
+    () => (me ? { me, refresh, endpoints, reloadEndpoints, openPalette: () => setPalette(true), openFeedback: () => setFeedback(true) } : null),
     [me, refresh, endpoints, reloadEndpoints],
   );
 
@@ -227,6 +240,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <main className="px-4 py-7 sm:px-6 lg:px-8">{children}</main>
       </div>
       {palette && <CommandPalette onClose={() => setPalette(false)} />}
+      {feedback && <FeedbackDialog onClose={() => setFeedback(false)} />}
       </ToastProvider>
     </Ctx.Provider>
   );

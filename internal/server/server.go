@@ -55,6 +55,11 @@ func (s *Server) routes() {
 	m.HandleFunc("POST /api/v1/tokens", s.authed(s.handleCreateToken))
 	m.HandleFunc("DELETE /api/v1/tokens/{id}", s.authed(s.handleDeleteToken))
 
+	// feedback
+	m.HandleFunc("POST /api/v1/feedback", s.authed(s.handleFeedback))
+	m.HandleFunc("GET /api/v1/admin/feedback", s.authed(s.handleAdminFeedback))
+	m.HandleFunc("DELETE /api/v1/admin/feedback/{id}", s.authed(s.handleAdminDeleteFeedback))
+
 	// CLI device login
 	m.HandleFunc("POST /api/v1/cli/auth/start", s.handleCLIStart)
 	m.HandleFunc("POST /api/v1/cli/auth/approve", s.authed(s.handleCLIApprove))

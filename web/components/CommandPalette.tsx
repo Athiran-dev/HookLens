@@ -3,14 +3,14 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "@/components/Shell";
-import { IconBolt, IconCode, IconCog, IconHome, IconKey, IconList, IconPlus, IconReplay, IconSearch } from "@/components/icons";
+import { IconBolt, IconChat, IconCode, IconCog, IconHome, IconKey, IconList, IconPlus, IconReplay, IconSearch } from "@/components/icons";
 
-type Item = { id: string; label: string; hint: string; href: string; icon: React.ComponentType<{ className?: string }> };
+type Item = { id: string; label: string; hint: string; href: string; icon: React.ComponentType<{ className?: string }>; run?: () => void };
 
 /** Ctrl/Cmd+K: jump to a page or endpoint, or search request payloads. */
 export default function CommandPalette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
-  const { endpoints } = useApp();
+  const { endpoints, openFeedback } = useApp();
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
   const input = useRef<HTMLInputElement>(null);
@@ -26,6 +26,7 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
       { id: "p-tun", label: "Tunnels", hint: "Page", href: "/tunnels/", icon: IconBolt },
       { id: "p-key", label: "API Keys", hint: "Page", href: "/keys/", icon: IconKey },
       { id: "p-set", label: "Settings", hint: "Page", href: "/settings/", icon: IconCog },
+      { id: "p-fb", label: "Send feedback", hint: "Action", href: "", icon: IconChat, run: openFeedback },
     ];
     const eps: Item[] = (endpoints ?? []).map((e) => ({ id: e.id, label: e.name, hint: "Endpoint", href: `/endpoint/?id=${e.id}`, icon: IconCode }));
     const term = q.trim().toLowerCase();
@@ -34,14 +35,15 @@ export default function CommandPalette({ onClose }: { onClose: () => void }) {
       filtered.push({ id: "search", label: `Search requests for “${q.trim()}”`, hint: "Requests", href: `/requests/?q=${encodeURIComponent(q.trim())}`, icon: IconSearch });
     }
     return filtered;
-  }, [q, endpoints]);
+  }, [q, endpoints, openFeedback]);
 
   useEffect(() => setSel(0), [q]);
 
   function go(i: Item | undefined) {
     if (!i) return;
     onClose();
-    router.push(i.href);
+    if (i.run) i.run();
+    else router.push(i.href);
   }
 
   return (

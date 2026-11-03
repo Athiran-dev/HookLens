@@ -38,6 +38,7 @@ export async function api<T = unknown>(method: string, path: string, body?: unkn
 export type User = { id: string; email: string; retention_days: number; created_at: string };
 export type MeResponse = {
   user: User;
+  is_admin: boolean;
   active_sessions: number;
   limits: { max_endpoints: number; max_tunnels: number; max_body_bytes: number };
 };

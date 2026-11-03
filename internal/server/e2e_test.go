@@ -60,12 +60,14 @@ type user struct {
 	e      *env
 	http   *http.Client
 	apiKey string
+	email  string
 }
 
 func (e *env) signup() *user {
 	jar, _ := cookiejar.New(nil)
 	u := &user{e: e, http: &http.Client{Jar: jar}}
 	email := fmt.Sprintf("t%d@example.com", time.Now().UnixNano())
+	u.email = email
 	if code, body := u.call("POST", "/api/v1/auth/signup", map[string]string{"email": email, "password": "correct horse"}); code != 201 {
 		e.t.Fatalf("signup: %d %v", code, body)
 	}
@@ -469,4 +471,17 @@ func TestSendTestWebhook(t *testing.T) {
 	if code, _ := u.call("POST", "/api/v1/endpoints/"+epID+"/test", nil); code != 409 {
 		t.Fatalf("disabled endpoint: want 409, got %d", code)
 	}
+}
+
+// list GETs a JSON array endpoint.
+func (u *user) list(path string) []map[string]any {
+	req, _ := http.NewRequest("GET", u.e.ts.URL+path, nil)
+	resp, err := u.http.Do(req)
+	if err != nil {
+		u.e.t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	var out []map[string]any
+	_ = json.NewDecoder(resp.Body).Decode(&out)
+	return out
 }
