@@ -31,7 +31,7 @@ type Config struct {
 func Load() (*Config, error) {
 	LoadDotEnv(".env")
 	c := &Config{
-		Addr:                str("ADDR", ":8080"),
+		Addr:                listenAddr(),
 		DatabaseURL:         str("DATABASE_URL", ""),
 		PublicURL:           strings.TrimRight(str("PUBLIC_URL", "http://localhost:8080"), "/"),
 		WebOrigin:           strings.TrimRight(str("WEB_ORIGIN", ""), "/"),
@@ -108,4 +108,15 @@ func splitList(v string) []string {
 		}
 	}
 	return out
+}
+
+// listenAddr is ADDR if set, otherwise ":$PORT" (what most hosts inject), otherwise ":8080".
+func listenAddr() string {
+	if v, ok := os.LookupEnv("ADDR"); ok && v != "" {
+		return v
+	}
+	if p := os.Getenv("PORT"); p != "" {
+		return ":" + p
+	}
+	return ":8080"
 }

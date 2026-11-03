@@ -19,7 +19,8 @@ RUN adduser -D -u 10001 app && apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=build /out/hooklens-api /app/hooklens-api
 COPY --from=web /web/out /app/web/out
-ENV STATIC_DIR=/app/web/out ADDR=:8080
+ENV STATIC_DIR=/app/web/out
 USER app
+# Listens on $PORT if the host sets one, otherwise 8080.
 EXPOSE 8080
 CMD ["/app/hooklens-api"]
